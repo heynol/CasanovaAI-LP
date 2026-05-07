@@ -13,7 +13,7 @@ export default function TermsOfService() {
       
       <div className="glass-card" style={{ padding: '4rem' }}>
         <h1 className="text-gradient-accent" style={{ fontSize: '3rem', marginBottom: '2rem' }}>Terms of Service</h1>
-        <div style={{ whiteSpace: 'pre-wrap', color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.8' }}>
+        <div style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', overflowWrap: 'break-word', wordBreak: 'break-word', color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.8' }}>
           {tosText}
         </div>
       </div>

@@ -2,10 +2,20 @@ import { ReactNode, useState, useRef, useEffect } from 'react';
 import { ChevronDown, Mail, Shield, Zap, Sparkles, Smartphone, Crosshair, Camera } from 'lucide-react';
 import { APP_STORE_BADGE, GOOGLE_PLAY_BADGE } from './badges';
 import Lottie from 'lottie-react';
-import glowAnimation from '../AppAssets/App Animations/_Archive/Animated Glow Lottie.json';
-import { Routes, Route, Link } from 'react-router-dom';
+import glowAnimation from '../AppAssets/App Animations/ColorGlow OnScreen Opaque.json';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 const IOS_LINK = "https://apps.apple.com/de/app/casanova-rizz-app/id6473753089";
 const ANDROID_LINK = "https://play.google.com/store/apps/details?id=ai.casanova.datingcopilot";
@@ -284,6 +294,7 @@ function LandingPage() {
 function App() {
   return (
     <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <ScrollToTop />
       <main style={{ flex: 1 }}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
