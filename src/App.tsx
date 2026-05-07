@@ -2,7 +2,7 @@ import { ReactNode, useState, useRef, useEffect } from 'react';
 import { ChevronDown, Mail, Shield, Zap, Sparkles, Smartphone, Crosshair, Camera } from 'lucide-react';
 import { APP_STORE_BADGE, GOOGLE_PLAY_BADGE } from './badges';
 import Lottie from 'lottie-react';
-import glowAnimation from '../AppAssets/App Animations/ColorGlow OnScreen Opaque.json';
+import glowAnimation from '../public/AppAssets/App Animations/ColorGlow OnScreen Opaque.json';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
