@@ -3,6 +3,9 @@ import { ChevronDown, Mail, Shield, Zap, Sparkles, Smartphone, Crosshair, Camera
 import { APP_STORE_BADGE, GOOGLE_PLAY_BADGE } from './badges';
 import Lottie from 'lottie-react';
 import glowAnimation from '../AppAssets/App Animations/_Archive/Animated Glow Lottie.json';
+import { Routes, Route, Link } from 'react-router-dom';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 const IOS_LINK = "https://apps.apple.com/de/app/casanova-rizz-app/id6473753089";
 const ANDROID_LINK = "https://play.google.com/store/apps/details?id=ai.casanova.datingcopilot";
@@ -254,8 +257,8 @@ function Footer() {
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>We value your feedback! ❤️</p>
           
           <div className="flex gap-6 mt-4" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-            <a href="#" className="hover-white">Privacy Policy</a>
-            <a href="#" className="hover-white">Terms of Service</a>
+            <Link to="/privacy-policy" className="hover-white" style={{ textDecoration: 'none' }}>Privacy Policy</Link>
+            <Link to="/terms-of-service" className="hover-white" style={{ textDecoration: 'none' }}>Terms of Service</Link>
           </div>
           
           <p style={{ marginTop: '2rem', color: 'var(--border-hover)', fontSize: '0.8rem' }}>
@@ -267,15 +270,29 @@ function Footer() {
   );
 }
 
-function App() {
+function LandingPage() {
   return (
     <>
       <Header />
       <Hero />
       <Features />
       <FAQ />
-      <Footer />
     </>
+  );
+}
+
+function App() {
+  return (
+    <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <main style={{ flex: 1 }}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
   );
 }
 
