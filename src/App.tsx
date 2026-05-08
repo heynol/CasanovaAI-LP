@@ -1,4 +1,10 @@
 import { ReactNode, useState, useRef, useEffect } from 'react';
+
+declare global {
+  interface Window {
+    fbq: any;
+  }
+}
 import { ChevronDown, Mail, Shield, Zap, Sparkles, Smartphone, Crosshair, Camera } from 'lucide-react';
 import { APP_STORE_BADGE, GOOGLE_PLAY_BADGE } from './badges';
 import Lottie from 'lottie-react';
@@ -12,10 +18,28 @@ function ScrollToTop() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    // Track page view on route change
+    if (typeof window.fbq === 'function') {
+      window.fbq('track', 'PageView');
+    }
   }, [pathname]);
 
   return null;
 }
+
+// FB Tracking helpers
+const trackSubmit = () => {
+  if (typeof window.fbq === 'function') {
+    window.fbq('track', 'SubmitApplication');
+  }
+};
+
+const trackContact = () => {
+  if (typeof window.fbq === 'function') {
+    window.fbq('track', 'Contact');
+  }
+};
+
 
 const IOS_LINK = "https://apps.apple.com/de/app/casanova-rizz-app/id6473753089";
 const ANDROID_LINK = "https://play.google.com/store/apps/details?id=ai.casanova.datingcopilot";
@@ -83,10 +107,10 @@ function Hero() {
           </p>
           
           <div className="flex gap-4 flex-wrap">
-            <a href={IOS_LINK} target="_blank" rel="noreferrer" style={{ transition: 'transform 0.2s', display: 'inline-block' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+            <a href={IOS_LINK} target="_blank" rel="noreferrer" onClick={trackSubmit} style={{ transition: 'transform 0.2s', display: 'inline-block' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
               <img src={APP_STORE_BADGE} alt="Download on App Store" style={{ height: '48px', objectFit: 'contain' }} />
             </a>
-            <a href={ANDROID_LINK} target="_blank" rel="noreferrer" style={{ transition: 'transform 0.2s', display: 'inline-block' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+            <a href={ANDROID_LINK} target="_blank" rel="noreferrer" onClick={trackSubmit} style={{ transition: 'transform 0.2s', display: 'inline-block' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
               <img src={GOOGLE_PLAY_BADGE} alt="Get it on Google Play" style={{ height: '48px', objectFit: 'contain' }} />
             </a>
           </div>
@@ -249,10 +273,10 @@ function Footer() {
       <div className="container flex flex-col items-center">
         <h2 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>Ready to <span className="text-gradient-accent">upgrade</span> your dating life?</h2>
         <div className="flex gap-4 mb-8">
-            <a href={IOS_LINK} target="_blank" rel="noreferrer" style={{ transition: 'transform 0.2s', display: 'inline-block' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+            <a href={IOS_LINK} target="_blank" rel="noreferrer" onClick={trackSubmit} style={{ transition: 'transform 0.2s', display: 'inline-block' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
               <img src={APP_STORE_BADGE} alt="Download on App Store" style={{ height: '48px', objectFit: 'contain' }} />
             </a>
-            <a href={ANDROID_LINK} target="_blank" rel="noreferrer" style={{ transition: 'transform 0.2s', display: 'inline-block' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
+            <a href={ANDROID_LINK} target="_blank" rel="noreferrer" onClick={trackSubmit} style={{ transition: 'transform 0.2s', display: 'inline-block' }} onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'} onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
               <img src={GOOGLE_PLAY_BADGE} alt="Get it on Google Play" style={{ height: '48px', objectFit: 'contain' }} />
             </a>
         </div>
@@ -262,7 +286,7 @@ function Footer() {
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-center gap-2 mb-2">
             <Mail size={18} color="var(--text-secondary)" />
-            <a href="mailto:info@getcasanova.ai" style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>info@getcasanova.ai</a>
+            <a href="mailto:info@getcasanova.ai" onClick={trackContact} style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>info@getcasanova.ai</a>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>We value your feedback! ❤️</p>
           
