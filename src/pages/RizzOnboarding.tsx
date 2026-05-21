@@ -94,7 +94,7 @@ export default function RizzOnboarding() {
 
   // References
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
   const chatStreamRef = useRef<HTMLDivElement>(null);
   const profileHeaderRef = useRef<HTMLDivElement>(null);
 
@@ -251,18 +251,38 @@ export default function RizzOnboarding() {
   }, []);
 
   // Auto-scroll chat to bottom
-  const scrollToBottom = () => {
+  const scrollToBottom = (instant = false) => {
     if (['intro-logo', 'intro-rizz', 'intro-persona', 'rewinding'].includes(flowStateRef.current)) return;
     setTimeout(() => {
       if (['intro-logo', 'intro-rizz', 'intro-persona', 'rewinding'].includes(flowStateRef.current)) return;
       if (chatStreamRef.current) {
         chatStreamRef.current.scrollTo({
           top: chatStreamRef.current.scrollHeight,
-          behavior: 'smooth'
+          behavior: instant ? 'instant' as ScrollBehavior : 'smooth'
         });
       }
     }, 100);
   };
+
+  // Scroll to bottom whenever the visual viewport shrinks (OS keyboard opens)
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const handleVVResize = () => {
+      if (['intro-logo', 'intro-rizz', 'intro-persona', 'rewinding'].includes(flowStateRef.current)) return;
+      // Small delay to let the layout reflow settle after keyboard animation
+      setTimeout(() => {
+        if (chatStreamRef.current) {
+          chatStreamRef.current.scrollTo({
+            top: chatStreamRef.current.scrollHeight,
+            behavior: 'instant' as ScrollBehavior
+          });
+        }
+      }, 80);
+    };
+    vv.addEventListener('resize', handleVVResize);
+    return () => vv.removeEventListener('resize', handleVVResize);
+  }, []);
 
   // Lock scroll to top during all intro states to prevent visual jumps
   useEffect(() => {
@@ -371,9 +391,12 @@ export default function RizzOnboarding() {
 
   // --- Jade Live API Call & Fallback ---
   const handleSendJadeMessage = async () => {
-    if (!inputText.trim() || isAwaitingAPI) return;
-    const text = inputText.trim();
+    // Read text from contenteditable div if inputText state is stale
+    const rawText = inputRef.current?.textContent?.trim() || inputText.trim();
+    if (!rawText || isAwaitingAPI) return;
+    const text = rawText;
     setInputText('');
+    if (inputRef.current) inputRef.current.textContent = '';
     setIsKeyboardExpanded(false); // Close keyboard, hide input
 
     const newUserMsg: Message = {
@@ -1270,10 +1293,19 @@ export default function RizzOnboarding() {
           outline: none;
           padding: 0.75rem 0.25rem;
           font-family: inherit;
+          min-height: 1.5rem;
+          max-height: 5rem;
+          overflow-y: auto;
+          white-space: pre-wrap;
+          word-break: break-word;
+          cursor: text;
+          /* Show placeholder via data attribute */
         }
 
-        .real-input::placeholder {
+        .real-input:empty::before {
+          content: attr(data-placeholder);
           color: rgba(255, 255, 255, 0.4);
+          pointer-events: none;
         }
 
         .input-send-btn {
@@ -2168,30 +2200,38 @@ export default function RizzOnboarding() {
                   onClick={() => inputRef.current?.focus()} 
                   style={{ cursor: 'text' }}
                 >
-                  <input 
+                  {/* contenteditable div instead of <input> to suppress Chrome's autofill toolbar */}
+                  <div
                     ref={inputRef}
-                    type="text" 
-                    placeholder="Your turn. Don't mess it up..."
                     className="real-input"
-                    value={inputText}
-                    onChange={(e) => setInputText(e.target.value)}
-                    autoFocus
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="off"
-                    spellCheck={false}
-                    data-form-type="other"
+                    contentEditable
+                    suppressContentEditableWarning
+                    data-placeholder="Your turn. Don't mess it up..."
+                    onInput={(e) => {
+                      const text = (e.currentTarget as HTMLDivElement).textContent || '';
+                      setInputText(text);
+                    }}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && inputText.trim()) {
-                        handleSendJadeMessage();
+                      if (e.key === 'Enter') {
+                        e.preventDefault(); // Prevent newline
+                        if (inputText.trim()) handleSendJadeMessage();
                       }
+                    }}
+                    onPaste={(e) => {
+                      // Paste as plain text only
+                      e.preventDefault();
+                      const text = e.clipboardData.getData('text/plain');
+                      document.execCommand('insertText', false, text);
                     }}
                   />
                   <button 
                     className={`input-send-btn ${inputText.trim() ? 'active' : ''}`}
                     disabled={!inputText.trim()}
+                    onMouseDown={(e) => {
+                      e.preventDefault(); // Prevent blurring the editable div
+                    }}
                     onClick={(e) => {
-                      e.stopPropagation(); // Avoid triggering parent focus
+                      e.stopPropagation();
                       handleSendJadeMessage();
                     }}
                   >
