@@ -217,16 +217,17 @@ export default function RizzOnboarding() {
     const fetchToken = async () => {
       // Fallback to the public dev sandbox secret in production if build-time environment variables are omitted
       const devSecret = import.meta.env.VITE_DEV_AUTH_SECRET || 'NAOUfmUyQY9J0/xJUbN9vOQQ9VsGG7Vvy0XoYs57Ah8=';
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       try {
-        // Try local dev proxy to bypass CORS
-        let response = await fetch('/api/get-dev-token');
-        if (!response.ok) {
-          // Direct fallback if local proxy is missing or fails (utilize the proxy route in production too)
-          const tokenUrl = import.meta.env.DEV
-            ? 'https://us-central1-casanova-ai-dev.cloudfunctions.net/miscAuth/auth/dev/id-token'
-            : '/api-rizz/miscAuth/auth/dev/id-token';
+        let response;
+        if (isLocal) {
+          // Try local dev proxy to bypass CORS
+          response = await fetch('/api/get-dev-token');
+        }
 
-          response = await fetch(tokenUrl, {
+        if (!response || !response.ok) {
+          // Direct fallback to absolute URL in production since static hosting doesn't run the dev server proxy
+          response = await fetch('https://us-central1-casanova-ai-dev.cloudfunctions.net/miscAuth/auth/dev/id-token', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -420,7 +421,10 @@ export default function RizzOnboarding() {
     try {
       if (apiToken) {
         // Send real API request
-        const apiUrl = '/api-rizz/rizzArena/onboarding/message';
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const apiUrl = isLocal
+          ? '/api-rizz/rizzArena/onboarding/message'
+          : 'https://us-central1-casanova-ai-dev.cloudfunctions.net/rizzArena/onboarding/message';
 
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -1896,6 +1900,11 @@ export default function RizzOnboarding() {
             /* Extend height to include bottom safe area so there's no black gap below */
             height: calc(275px + env(safe-area-inset-bottom, 0px));
             padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+          }
+          /* Lift fail/success cards above the home indicator */
+          .fail-card,
+          .success-gold-box {
+            margin-bottom: calc(1rem + env(safe-area-inset-bottom, 16px));
           }
         }
 
