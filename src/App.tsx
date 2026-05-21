@@ -8,10 +8,10 @@ declare global {
 import { ChevronDown, Mail, Shield, Zap, Sparkles, Smartphone, Crosshair, Camera } from 'lucide-react';
 import { APP_STORE_BADGE, GOOGLE_PLAY_BADGE } from './badges';
 import Lottie from 'lottie-react';
-import glowAnimation from '../public/AppAssets/App Animations/ColorGlow OnScreen Opaque.json';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import RizzOnboarding from './pages/RizzOnboarding';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -77,6 +77,14 @@ function Header() {
 
 function Hero() {
   const lottieRef = useRef<any>(null);
+  const [glowAnimData, setGlowAnimData] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/AppAssets/App Animations/ColorGlow OnScreen Opaque.json')
+      .then((res) => res.json())
+      .then((data) => setGlowAnimData(data))
+      .catch((err) => console.error('Failed to load glow animation in App.tsx', err));
+  }, []);
 
   useEffect(() => {
     if (lottieRef.current) {
@@ -118,8 +126,10 @@ function Hero() {
         
         <div className="perspective-container flex justify-center animate-float" style={{ zIndex: 10, position: 'relative' }}>
           <div style={{ position: 'absolute', top: '85%', left: '50%', transform: 'translate(-50%, -50%)', width: '1200px', height: '1200px', zIndex: -1, opacity: 0.8, pointerEvents: 'none' }}>
-            {/* @ts-ignore */}
-            {typeof Lottie === 'function' ? <Lottie lottieRef={lottieRef} animationData={glowAnimation} loop={true} /> : <Lottie.default lottieRef={lottieRef} animationData={glowAnimation} loop={true} />}
+            {glowAnimData && (
+              /* @ts-ignore */
+              typeof Lottie === 'function' ? <Lottie lottieRef={lottieRef} animationData={glowAnimData} loop={true} /> : <Lottie.default lottieRef={lottieRef} animationData={glowAnimData} loop={true} />
+            )}
           </div>
           <div className="device-mockup mockup-angled-left" style={{ width: '320px', height: '650px' }}>
             <img 
@@ -316,6 +326,9 @@ function LandingPage() {
 }
 
 function App() {
+  const location = useLocation();
+  const isOnboarding = location.pathname.toLowerCase() === '/rizzonboarding';
+
   return (
     <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <ScrollToTop />
@@ -324,9 +337,10 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/RizzOnboarding" element={<RizzOnboarding />} />
         </Routes>
       </main>
-      <Footer />
+      {!isOnboarding && <Footer />}
     </div>
   );
 }

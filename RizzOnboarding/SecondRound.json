@@ -1,0 +1,440 @@
+{
+    "persona": "Chloe",
+    "start_node": "1_Initial",
+    "nodes": {
+        "1_Initial": {
+            "chloe_message": "So... are you actually funny, or is your profile just good marketing? 👀",
+            "chloe_delay_ms": 0,
+            "is_end_state": false,
+            "keyboard_analysis": "Ah, the classic shit test. She’s trying to put you on the defensive. Let's flip the script. Lean into the PR angle, call her bluff directly, or play the arrogant premium tier.",
+            "user_options": [
+                {
+                    "text": "100% marketing. The PR team wrote this, I’m just the pretty face.",
+                    "score": 7.5,
+                    "next_node": "2A_Marketing"
+                },
+                {
+                    "text": "Let’s skip the text interview. Drinks on Thursday and you can evaluate me live.",
+                    "score": 8.1,
+                    "next_node": "2B_Direct"
+                },
+                {
+                    "text": "I charge a subscription fee for the premium jokes. You're currently on the free tier.",
+                    "score": 7.8,
+                    "next_node": "2C_Premium"
+                }
+            ]
+        },
+        "2A_Marketing": {
+            "chloe_message": "At least you're honest. So if I meet the pretty face, am I going to be bored?",
+            "chloe_delay_ms": 1500,
+            "is_end_state": false,
+            "keyboard_analysis": "She appreciates the self-awareness but she's pushing for more. Keep the metaphor going, but escalate it to something physical like drinks or food.",
+            "user_options": [
+                {
+                    "text": "I'm a terrible conversationalist, but I do my own stunts. Mostly involving tequila.",
+                    "score": 8.6,
+                    "next_node": "3A1_Stunts"
+                },
+                {
+                    "text": "Depends. My contract clearly states I only have to be entertaining over sushi.",
+                    "score": 8.8,
+                    "next_node": "3A2_Contract"
+                },
+                {
+                    "text": "I just fired the PR team. It’s just me now, improvising. It's dangerous.",
+                    "score": 8.9,
+                    "next_node": "3A3_Improv"
+                }
+            ]
+        },
+        "2B_Direct": {
+            "chloe_message": "Confident, I like it. But what if you fail the live evaluation?",
+            "chloe_delay_ms": 1200,
+            "is_end_state": false,
+            "keyboard_analysis": "She respected the pull, but threw up a shield. Time to show her you don't even consider failure an option. Set the stakes.",
+            "user_options": [
+                {
+                    "text": "I offer a 100% money-back guarantee. I'll even pay for your Uber home.",
+                    "score": 8.8,
+                    "next_node": "3B1_Guarantee"
+                },
+                {
+                    "text": "If I fail, I buy drinks all night. If I win, you owe me a homemade dinner.",
+                    "score": 9.1,
+                    "next_node": "3B2_Stakes"
+                },
+                {
+                    "text": "I don't fail. But bring a notepad just in case, you might want to take notes.",
+                    "score": 9.0,
+                    "next_node": "3B3_Notes"
+                }
+            ]
+        },
+        "2C_Premium": {
+            "chloe_message": "Oh really? And what exactly does the premium package include?",
+            "chloe_delay_ms": 1800,
+            "is_end_state": false,
+            "keyboard_analysis": "Hook, line, and sinker. She’s literally asking you to pitch the date. Give her an offer she can't refuse with highly specific details.",
+            "user_options": [
+                {
+                    "text": "Undivided attention, zero awkward silences, and me picking the wine.",
+                    "score": 9.0,
+                    "next_node": "3C1_Perks"
+                },
+                {
+                    "text": "I can offer a 30-minute free trial over coffee. No credit card required.",
+                    "score": 8.7,
+                    "next_node": "3C2_Trial"
+                },
+                {
+                    "text": "VIP access. Which means we skip the small talk and go straight to finding a speakeasy.",
+                    "score": 9.2,
+                    "next_node": "3C3_VIP"
+                }
+            ]
+        },
+        "3A1_Stunts": {
+            "chloe_message": "Tequila stunts? Okay, now I'm slightly terrified but mostly intrigued. What's the signature move?",
+            "chloe_delay_ms": 1400,
+            "is_end_state": false,
+            "keyboard_analysis": "You've got her curious. Paint a picture of exactly what the date looks like. Don't ask, tell.",
+            "user_options": [
+                {
+                    "text": "Ordering the spiciest margarita on the menu and not breaking eye contact while I drink it.",
+                    "score": 9.7,
+                    "next_node": "End_A1a"
+                },
+                {
+                    "text": "Knowing exactly which dive bar has the best jukebox to match the tequila.",
+                    "score": 9.5,
+                    "next_node": "End_A1b"
+                },
+                {
+                    "text": "That's classified information. Only revealed to those with high-level security clearance.",
+                    "score": 9.8,
+                    "next_node": "End_A1c"
+                }
+            ]
+        },
+        "3A2_Contract": {
+            "chloe_message": "Sushi, huh? You better know the good spots. California rolls won't cut it.",
+            "chloe_delay_ms": 1300,
+            "is_end_state": false,
+            "keyboard_analysis": "She's challenging your taste. Prove you have high standards and lock down the logistics.",
+            "user_options": [
+                {
+                    "text": "I'm offended you even brought up California rolls. Omakase or nothing. Friday?",
+                    "score": 9.8,
+                    "next_node": "End_A2a"
+                },
+                {
+                    "text": "I know a place hidden behind a laundromat. Don't ask questions, just trust me.",
+                    "score": 9.9,
+                    "next_node": "End_A2b"
+                },
+                {
+                    "text": "I have a guy. It involves a secret handshake and extremely fresh tuna. Thursday?",
+                    "score": 9.7,
+                    "next_node": "End_A2c"
+                }
+            ]
+        },
+        "3A3_Improv": {
+            "chloe_message": "Improvising? That sounds like a recipe for disaster. Or a really good story.",
+            "chloe_delay_ms": 1600,
+            "is_end_state": false,
+            "keyboard_analysis": "She loves the danger element. Frame the date as an adventure rather than a formal interview.",
+            "user_options": [
+                {
+                    "text": "Usually both. Let's make some bad decisions at a rooftop bar on Thursday.",
+                    "score": 9.6,
+                    "next_node": "End_A3a"
+                },
+                {
+                    "text": "I promise at least three plot twists before dessert. Are you in?",
+                    "score": 9.8,
+                    "next_node": "End_A3b"
+                },
+                {
+                    "text": "The best stories start with 'so we fired the PR team...'. Let's write chapter one Friday.",
+                    "score": 9.9,
+                    "next_node": "End_A3c"
+                }
+            ]
+        },
+        "3B1_Guarantee": {
+            "chloe_message": "An Uber home? Wow, you must be really sure of yourself to offer that kind of insurance.",
+            "chloe_delay_ms": 1200,
+            "is_end_state": false,
+            "keyboard_analysis": "She's testing if the confidence is real. Double down on it and set the time.",
+            "user_options": [
+                {
+                    "text": "I haven't had to pay out a claim yet. Thursday night, let's test my streak.",
+                    "score": 9.7,
+                    "next_node": "End_B1a"
+                },
+                {
+                    "text": "I'm just a generous guy. Plus, I know my espresso martinis are undefeated.",
+                    "score": 9.8,
+                    "next_node": "End_B1b"
+                },
+                {
+                    "text": "Only one way to find out. Send me your schedule, I'll send the itinerary.",
+                    "score": 9.6,
+                    "next_node": "End_B1c"
+                }
+            ]
+        },
+        "3B2_Stakes": {
+            "chloe_message": "A homemade dinner? You're playing a dangerous game. I burn water.",
+            "chloe_delay_ms": 1400,
+            "is_end_state": false,
+            "keyboard_analysis": "She gave you a massive opening. Tease her lack of culinary skills and propose a solution.",
+            "user_options": [
+                {
+                    "text": "Perfect, we'll order pizza to your place after I win. Problem solved.",
+                    "score": 9.9,
+                    "next_node": "End_B2a"
+                },
+                {
+                    "text": "I'll accept a highly curated cheese board as a substitute. Deal?",
+                    "score": 9.7,
+                    "next_node": "End_B2b"
+                },
+                {
+                    "text": "Then I'll cook for you when I win. You just have to sit there and look pretty.",
+                    "score": 9.8,
+                    "next_node": "End_B2c"
+                }
+            ]
+        },
+        "3B3_Notes": {
+            "chloe_message": "Taking notes on a date? You better be dropping some serious wisdom.",
+            "chloe_delay_ms": 1500,
+            "is_end_state": false,
+            "keyboard_analysis": "Frame the date as an exclusive masterclass. It shifts the dynamic entirely in your favor.",
+            "user_options": [
+                {
+                    "text": "Lesson one: How to properly order a Mezcal Negroni. Class starts at 8 on Friday.",
+                    "score": 9.7,
+                    "next_node": "End_B3a"
+                },
+                {
+                    "text": "I'll provide the syllabus over drinks. You just bring the enthusiasm.",
+                    "score": 9.6,
+                    "next_node": "End_B3b"
+                },
+                {
+                    "text": "It's an immersive masterclass. First assignment: Meet me at Soho House on Thursday.",
+                    "score": 9.9,
+                    "next_node": "End_B3c"
+                }
+            ]
+        },
+        "3C1_Perks": {
+            "chloe_message": "You picking the wine? That's a lot of power to hand over to a stranger.",
+            "chloe_delay_ms": 1300,
+            "is_end_state": false,
+            "keyboard_analysis": "She's resisting playfully. Reassure her of your impeccable taste and close.",
+            "user_options": [
+                {
+                    "text": "With great power comes great taste. I promise I won't disappoint.",
+                    "score": 9.7,
+                    "next_node": "End_C1a"
+                },
+                {
+                    "text": "Trust me, I have a Ph.D. in pairing Italian reds with good conversation.",
+                    "score": 9.8,
+                    "next_node": "End_C1b"
+                },
+                {
+                    "text": "If I pick wrong, you can publicly roast my profile. Fair trade?",
+                    "score": 9.5,
+                    "next_node": "End_C1c"
+                }
+            ]
+        },
+        "3C2_Trial": {
+            "chloe_message": "30 minutes? That's a tight window to prove you're not a serial killer.",
+            "chloe_delay_ms": 1500,
+            "is_end_state": false,
+            "keyboard_analysis": "Classic objection. Handle it with extreme sarcasm and set the venue.",
+            "user_options": [
+                {
+                    "text": "I can usually prove it in 15. The other 15 is just to show off my jawline.",
+                    "score": 9.9,
+                    "next_node": "End_C2a"
+                },
+                {
+                    "text": "Efficiency is key. Plus, if we hate each other, you have a built-in escape route.",
+                    "score": 9.6,
+                    "next_node": "End_C2b"
+                },
+                {
+                    "text": "I'll bring a background check to the coffee shop. Thursday morning?",
+                    "score": 9.7,
+                    "next_node": "End_C2c"
+                }
+            ]
+        },
+        "3C3_VIP": {
+            "chloe_message": "A hidden speakeasy? Okay Gatsby, color me interested. What's the password?",
+            "chloe_delay_ms": 1400,
+            "is_end_state": false,
+            "keyboard_analysis": "You sold her on the vibe. Now build a little mystery around the logistics to seal it.",
+            "user_options": [
+                {
+                    "text": "I can't text it, it's highly confidential. I have to whisper it to you in person.",
+                    "score": 9.8,
+                    "next_node": "End_C3a"
+                },
+                {
+                    "text": "The password is 'God-Tier Rizz'. Try not to laugh when you say it to the bouncer.",
+                    "score": 9.9,
+                    "next_node": "End_C3b"
+                },
+                {
+                    "text": "You don't need a password when you're with me. Wear black, see you Friday.",
+                    "score": 9.7,
+                    "next_node": "End_C3c"
+                }
+            ]
+        },
+        "End_A1a": {
+            "chloe_message": "A spicy marg staring contest? You're on. 🌶️",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_A1b": {
+            "chloe_message": "Better have some good rock on that jukebox. See you then.",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        },
+        "End_A1c": {
+            "chloe_message": "I'll clear my Thursday. Clear my clearance. 😉",
+            "chloe_delay_ms": 1300,
+            "is_end_state": true
+        },
+        "End_A2a": {
+            "chloe_message": "Omakase it is. Don't disappoint me. 🍣",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_A2b": {
+            "chloe_message": "A laundromat? Okay, I love a sketchy hidden gem. Deal.",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        },
+        "End_A2c": {
+            "chloe_message": "I'm trusting your tuna guy. Send me the spot.",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_A3a": {
+            "chloe_message": "Bad decisions on a rooftop sounds like my kind of Thursday. ✨",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        },
+        "End_A3b": {
+            "chloe_message": "Three plot twists? Consider me invested. Send the address.",
+            "chloe_delay_ms": 1300,
+            "is_end_state": true
+        },
+        "End_A3c": {
+            "chloe_message": "Chapter one it is. Bring your best material.",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_B1a": {
+            "chloe_message": "We'll see if you keep that perfect record. Send the time.",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        },
+        "End_B1b": {
+            "chloe_message": "Espresso martinis? Okay, you found my weakness. Deal. 🍸",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_B1c": {
+            "chloe_message": "Schedule sent. Awaiting your flawless itinerary.",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        },
+        "End_B2a": {
+            "chloe_message": "Pizza at mine? Only if you actually win. We'll see.",
+            "chloe_delay_ms": 1300,
+            "is_end_state": true
+        },
+        "End_B2b": {
+            "chloe_message": "A cheese board I can handle. Challenge accepted. 🧀",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_B2c": {
+            "chloe_message": "I excel at sitting and looking pretty. See you Thursday.",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        },
+        "End_B3a": {
+            "chloe_message": "I'll bring my notebook. Class better be good.",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_B3b": {
+            "chloe_message": "I always bring the enthusiasm. See you then.",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        },
+        "End_B3c": {
+            "chloe_message": "Soho House it is. Don't be late for your own class. 🥂",
+            "chloe_delay_ms": 1300,
+            "is_end_state": true
+        },
+        "End_C1a": {
+            "chloe_message": "I'm holding you to that. Send the reservation. 🍷",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_C1b": {
+            "chloe_message": "A Ph.D in wine? Okay Dr. Rizz, see you Thursday.",
+            "chloe_delay_ms": 1300,
+            "is_end_state": true
+        },
+        "End_C1c": {
+            "chloe_message": "Oh, I will absolutely roast you if it's bad. Deal.",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        },
+        "End_C2a": {
+            "chloe_message": "Hahah alright, let's see this famous jawline. Thursday morning.",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_C2b": {
+            "chloe_message": "I appreciate a good escape route. See you Thursday. ☕",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        },
+        "End_C2c": {
+            "chloe_message": "Bring the background check and a flat white. Deal.",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_C3a": {
+            "chloe_message": "Whispering secrets already? Send the pin. 🤫",
+            "chloe_delay_ms": 1200,
+            "is_end_state": true
+        },
+        "End_C3b": {
+            "chloe_message": "I'm definitely going to laugh. But okay, see you Friday.",
+            "chloe_delay_ms": 1300,
+            "is_end_state": true
+        },
+        "End_C3c": {
+            "chloe_message": "I love the confidence. I'll wear black. ✨",
+            "chloe_delay_ms": 1100,
+            "is_end_state": true
+        }
+    }
+}
