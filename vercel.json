@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api-rizz/:path*",
+      "destination": "https://us-central1-casanova-ai-dev.cloudfunctions.net/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

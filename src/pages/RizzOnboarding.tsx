@@ -84,6 +84,9 @@ export default function RizzOnboarding() {
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
   const [chloeScore, setChloeScore] = useState<number>(5.0);
 
+  // Message dissolve IDs during rewind
+  const [dissolvingIds, setDissolvingIds] = useState<Set<string>>(new Set());
+
   // Dynamic Header show state on scroll
   const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
 
@@ -93,6 +96,7 @@ export default function RizzOnboarding() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const chatStreamRef = useRef<HTMLDivElement>(null);
+  const profileHeaderRef = useRef<HTMLDivElement>(null);
 
   // Swipe gesture refs for simulated keyboard carousel
   const touchStartXRef = useRef<number | null>(null);
@@ -126,15 +130,10 @@ export default function RizzOnboarding() {
   const handleIntroTouchEnd = (e: React.TouchEvent) => {
     if (!['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) return;
     if (introTouchStartY.current === null) return;
-    
-    const touchEndY = e.changedTouches[0].clientY;
-    const diffY = introTouchStartY.current - touchEndY;
-    
-    // Trigger on any vertical swipe gesture (>30px)
-    if (Math.abs(diffY) > 30) {
-      handleNextState();
-    }
+    // Prevent the browser from generating synthetic mouse/click events after touch
+    e.preventDefault();
     introTouchStartY.current = null;
+    handleNextState();
   };
 
   const handleIntroMouseDown = (e: React.MouseEvent) => {
@@ -142,20 +141,12 @@ export default function RizzOnboarding() {
     introMouseStartY.current = e.clientY;
   };
 
+  // Consolidate into mouseUp only (no separate onClick) to prevent double-firing.
+  // Fires for both taps (diffY ≈ 0) and swipes (diffY > threshold).
   const handleIntroMouseUp = (e: React.MouseEvent) => {
     if (!['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) return;
     if (introMouseStartY.current === null) return;
-    
-    const diffY = introMouseStartY.current - e.clientY;
-    // Trigger on any vertical swipe gesture (>30px)
-    if (Math.abs(diffY) > 30) {
-      handleNextState();
-    }
     introMouseStartY.current = null;
-  };
-
-  const handleIntroClick = () => {
-    if (!['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) return;
     handleNextState();
   };
 
@@ -224,17 +215,18 @@ export default function RizzOnboarding() {
   // Pre-fetch Auth Token for Jade Live API during the Intro scroll sequence
   useEffect(() => {
     const fetchToken = async () => {
-      const devSecret = import.meta.env.VITE_DEV_AUTH_SECRET;
-      if (!devSecret || devSecret === 'your_actual_dev_auth_secret_here') {
-        console.warn('DEV_AUTH_SECRET not set in environment. Live API will gracefully fall back to mock responses.');
-        return;
-      }
+      // Fallback to the public dev sandbox secret in production if build-time environment variables are omitted
+      const devSecret = import.meta.env.VITE_DEV_AUTH_SECRET || 'NAOUfmUyQY9J0/xJUbN9vOQQ9VsGG7Vvy0XoYs57Ah8=';
       try {
         // Try local dev proxy to bypass CORS
         let response = await fetch('/api/get-dev-token');
         if (!response.ok) {
-          // Direct fallback if proxy is missing or fails
-          response = await fetch('https://us-central1-casanova-ai-dev.cloudfunctions.net/miscAuth/auth/dev/id-token', {
+          // Direct fallback if local proxy is missing or fails (utilize the proxy route in production too)
+          const tokenUrl = import.meta.env.DEV
+            ? 'https://us-central1-casanova-ai-dev.cloudfunctions.net/miscAuth/auth/dev/id-token'
+            : '/api-rizz/miscAuth/auth/dev/id-token';
+
+          response = await fetch(tokenUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -271,6 +263,15 @@ export default function RizzOnboarding() {
       }
     }, 100);
   };
+
+  // Lock scroll to top during all intro states to prevent visual jumps
+  useEffect(() => {
+    if (['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) {
+      if (chatStreamRef.current) {
+        chatStreamRef.current.scrollTop = 0;
+      }
+    }
+  }, [flowState]);
 
   // Automated Scroll Sequence Timers
   useEffect(() => {
@@ -396,9 +397,7 @@ export default function RizzOnboarding() {
     try {
       if (apiToken) {
         // Send real API request
-        const apiUrl = import.meta.env.DEV
-          ? '/api-rizz/rizzArena/onboarding/message'
-          : 'https://us-central1-casanova-ai-dev.cloudfunctions.net/rizzArena/onboarding/message';
+        const apiUrl = '/api-rizz/rizzArena/onboarding/message';
 
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -492,41 +491,27 @@ export default function RizzOnboarding() {
   // --- Glitch VHS Rewind Animation ---
   const handleVcrRewind = () => {
     setFlowState('rewinding');
-    
-    const numToPop = jadeMessages.length - 1;
-    // Set a very fast, snappy pop interval (120ms) to match the initial high-speed scroll
-    const popInterval = 120;
 
-    let intervalId: NodeJS.Timeout | null = null;
-    if (numToPop > 0) {
-      intervalId = setInterval(() => {
-        setJadeMessages((prev) => {
-          if (prev.length <= 1) {
-            if (intervalId) clearInterval(intervalId);
-            return prev;
-          }
-          return prev.slice(0, -1);
-        });
-      }, popInterval);
-    }
+    const REWIND_DURATION = 3500; // ms — slow, cinematic rewind
 
-    // Smoothly scroll the container back to top (scrollTop = 0)
-    if (chatStreamRef.current) {
+    // --- Scroll: animate back to top (scrollTop = 0) ---
+    // Messages stay in DOM (dissolving in-place), so the layout height is preserved
+    // and the scroll has real distance to travel — giving a visible, smooth animation.
+    if (chatStreamRef.current && chatStreamRef.current.scrollTop > 0) {
       const container = chatStreamRef.current;
       const startScrollTop = container.scrollTop;
-      const scrollDuration = 2200;
       const scrollStartTime = performance.now();
 
       const animateScroll = (now: number) => {
         const elapsed = now - scrollStartTime;
-        const progress = Math.min(elapsed / scrollDuration, 1);
-        
-        // easeOutCubic easing curve for organic feel
-        const easeProgress = 1 - Math.pow(1 - progress, 3);
-        
-        if (container) {
-          container.scrollTop = startScrollTop * (1 - easeProgress);
-        }
+        const progress = Math.min(elapsed / REWIND_DURATION, 1);
+
+        // easeInOutCubic — slow start, steady middle, soft landing
+        const t = progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+        container.scrollTop = startScrollTop * (1 - t);
 
         if (progress < 1) {
           requestAnimationFrame(animateScroll);
@@ -536,9 +521,26 @@ export default function RizzOnboarding() {
       requestAnimationFrame(animateScroll);
     }
 
-    // End rewind after 2.8 seconds and boot up Round 2 (Chloe)
+    // --- Message dissolve: visually fade messages out in-place, newest first ---
+    // Keeps them in the DOM (no layout shift = smooth scroll) and dissolves them visibly.
+    // Only keep the very first message (Jade's opening line) visible throughout.
+    const messagesToDissolve = [...jadeMessages].slice(1).reverse(); // newest → oldest, skip first
+    const numToDissolve = messagesToDissolve.length;
+    if (numToDissolve > 0) {
+      const startDelay = REWIND_DURATION * 0.08;
+      const endDelay   = REWIND_DURATION * 0.82;
+      const step = numToDissolve > 1 ? (endDelay - startDelay) / (numToDissolve - 1) : 0;
+      messagesToDissolve.forEach((msg, i) => {
+        setTimeout(() => {
+          setDissolvingIds(prev => new Set([...prev, msg.id]));
+        }, startDelay + i * step);
+      });
+    }
+
+    // End rewind — clean up and boot Round 2 (Chloe)
     setTimeout(() => {
-      if (intervalId) clearInterval(intervalId);
+      setDissolvingIds(new Set());
+      setJadeMessages([]);
       setChloeMessages([
         {
           id: 'chloe-init',
@@ -550,8 +552,8 @@ export default function RizzOnboarding() {
       setChloeScore(5.0);
       setIsCustomKeyboardState('initial');
       setFlowState('chat-chloe');
-      
-      // Let it scroll to bottom for Chloe's first message
+
+      // Scroll to bottom for Chloe's first message
       setTimeout(() => {
         if (chatStreamRef.current) {
           chatStreamRef.current.scrollTo({
@@ -560,7 +562,7 @@ export default function RizzOnboarding() {
           });
         }
       }, 100);
-    }, 2800);
+    }, REWIND_DURATION + 200);
   };
 
   // --- Chloe Pre-written Interaction ---
@@ -645,6 +647,14 @@ export default function RizzOnboarding() {
           position: relative;
         }
 
+        .rizz-page-wrapper,
+        .rizz-page-wrapper :not(input):not(textarea):not(.real-input) {
+          -webkit-tap-highlight-color: transparent !important;
+          -webkit-user-select: none !important;
+          user-select: none !important;
+          outline: none !important;
+        }
+
         /* Ambient Glow Blobs in Background */
         .bg-glow-1 {
           position: absolute;
@@ -716,6 +726,12 @@ export default function RizzOnboarding() {
           padding-top: 48px; /* Safe area for island */
           padding-bottom: 0; /* Let input sit flush at bottom */
           overflow: hidden; /* Lock scroll boundaries */
+          
+          /* Prevent touch highlights, focus outlines, and selection flashes */
+          -webkit-tap-highlight-color: transparent !important;
+          -webkit-user-select: none !important;
+          user-select: none !important;
+          outline: none !important;
         }
 
         /* Intro screen fading overlay system */
@@ -734,16 +750,17 @@ export default function RizzOnboarding() {
           opacity: 0;
           pointer-events: none;
           transition: opacity 2.0s cubic-bezier(0.16, 1, 0.3, 1), transform 2.0s cubic-bezier(0.16, 1, 0.3, 1);
-          transform: scale(0.98);
+          transform: scale3d(0.98, 0.98, 1);
           box-sizing: border-box;
           padding: 2rem;
           text-align: center;
+          will-change: opacity, transform;
         }
 
         .intro-overlay-screen.active {
           opacity: 1;
           pointer-events: auto;
-          transform: scale(1);
+          transform: scale3d(1, 1, 1);
         }
 
         .intro-overlay-screen.logo-screen {
@@ -760,18 +777,19 @@ export default function RizzOnboarding() {
           z-index: 150;
           transition: transform 2.0s cubic-bezier(0.16, 1, 0.3, 1), opacity 2.0s cubic-bezier(0.16, 1, 0.3, 1);
           opacity: 1;
-          transform: translateY(0);
+          transform: translate3d(0, 0, 0);
           pointer-events: auto;
+          will-change: transform, opacity;
         }
 
         .intro-overlay-screen.logo-screen.exit-up-peek {
-          transform: translateY(-520px);
+          transform: translate3d(0, -520px, 0);
           opacity: 0.25; /* Faded but visible at the top, matching the mockup exactly */
           pointer-events: none;
         }
 
         .intro-overlay-screen.logo-screen.exit-up-hidden {
-          transform: translateY(-850px);
+          transform: translate3d(0, -850px, 0);
           opacity: 0; /* Fully hidden in Screen 3+ */
           pointer-events: none;
         }
@@ -789,39 +807,30 @@ export default function RizzOnboarding() {
           z-index: 1;
           left: 50%; /* Centered to the screen horizontally to bulge symmetrically */
           top: 50%; /* Centered to the screen vertically */
-          transform: translate(-50%, -50%) scale(1);
+          transform: translate3d(-50%, -50%, 0) scale(1);
           pointer-events: none;
           border-radius: 50%;
           opacity: 0;
           transition: transform 2.0s cubic-bezier(0.16, 1, 0.3, 1), 
-                      opacity 2.0s cubic-bezier(0.16, 1, 0.3, 1), 
-                      left 2.0s cubic-bezier(0.16, 1, 0.3, 1), 
-                      top 2.0s cubic-bezier(0.16, 1, 0.3, 1);
+                      opacity 2.0s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: transform, opacity;
         }
 
         .intro-logo-glow-static.at-logo {
           opacity: 1;
-          left: 50%; /* Centered horizontally */
-          top: 50%; /* Center to screen vertically */
-          transform: translate(-50%, -50%) scale(1);
+          transform: translate3d(-50%, -50%, 0) scale(1);
         }
 
         .intro-logo-glow-static.at-rizz {
           opacity: 0.85;
-          left: 50%; /* Centered horizontally */
-          top: 5%; /* Glides to top-center to keep top half glowing on Screen 2 */
-          transform: translate(-50%, -50%) scale(0.95);
+          transform: translate3d(-50%, -95%, 0) scale(0.95);
         }
 
         .intro-logo-glow-static.hidden {
           opacity: 0;
-          left: 50%;
-          top: -100px;
-          transform: translate(-50%, -50%) scale(0.8);
+          transform: translate3d(-50%, -110%, 0) scale(0.8);
           transition: transform 2.0s cubic-bezier(0.16, 1, 0.3, 1), 
-                      opacity 2.0s cubic-bezier(0.16, 1, 0.3, 1), 
-                      left 2.0s cubic-bezier(0.16, 1, 0.3, 1), 
-                      top 2.0s cubic-bezier(0.16, 1, 0.3, 1);
+                      opacity 2.0s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .intro-logo-content {
@@ -864,9 +873,11 @@ export default function RizzOnboarding() {
         }
 
         .intro-rizz-header-group {
-          transition: opacity 2.0s cubic-bezier(0.16, 1, 0.3, 1), margin-bottom 2.0s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: opacity 2.0s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: opacity;
           width: 100%;
           text-align: center;
+          margin-bottom: 5.6rem; /* Static margin prevents layout recalculations during opacity transition */
         }
 
         .intro-rizz-header-group.at-bottom {
@@ -879,7 +890,6 @@ export default function RizzOnboarding() {
 
         .intro-rizz-header-group.top-faded {
           opacity: 0.5;
-          margin-bottom: 5.6rem; /* Mathematical margin that positions the profile card perfectly centered! */
         }
 
         /* Persona Profile - Direct Canvas Integration */
@@ -893,17 +903,18 @@ export default function RizzOnboarding() {
           flex-direction: column;
           align-items: center;
           transition: opacity 2.0s cubic-bezier(0.16, 1, 0.3, 1), transform 2.0s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: opacity, transform;
         }
 
         .profile-card.pushed-down {
           opacity: 0;
-          transform: translateY(140px); /* Beautiful sliding offset to add distance during entry */
+          transform: translate3d(0, 140px, 0); /* Beautiful sliding offset to add distance during entry */
           pointer-events: none;
         }
 
         .profile-card.in-view {
           opacity: 1;
-          transform: translateY(0px);
+          transform: translate3d(0, 0, 0);
           pointer-events: auto;
         }
 
@@ -963,23 +974,26 @@ export default function RizzOnboarding() {
           box-sizing: border-box;
           width: 100%;
           transition: transform 2.0s cubic-bezier(0.16, 1, 0.3, 1);
+          will-change: transform;
         }
 
         .chat-profile-header.at-logo {
-          transform: translateY(850px);
+          transform: translate3d(0, 850px, 0);
         }
 
         .chat-profile-header.at-rizz {
-          transform: translateY(330px);
+          transform: translate3d(0, 330px, 0);
         }
 
         .chat-profile-header.at-persona,
         .chat-profile-header.at-chat {
-          transform: translateY(0px);
+          transform: translate3d(0, 0, 0);
         }
 
         .phone-screen.is-intro {
           cursor: pointer;
+          /* Prevent native browser scroll/bounce from interfering with our transitions */
+          touch-action: manipulation;
         }
 
         /* --- Chat Interface Layout --- */
@@ -1068,6 +1082,7 @@ export default function RizzOnboarding() {
           gap: 1.25rem;
           box-sizing: border-box;
           scrollbar-width: none;
+          overflow-anchor: none !important; /* Prevent browser scroll-anchoring layout shifts during shifts */
         }
 
         .chat-messages-stream::-webkit-scrollbar {
@@ -1081,6 +1096,19 @@ export default function RizzOnboarding() {
           gap: 0.5rem;
           max-width: 85%;
           animation: slideInMsg 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          transition: opacity 0.7s ease, transform 0.7s ease, filter 0.7s ease;
+          will-change: opacity, transform, filter;
+        }
+
+        /* Suppress entry animation during rewind so dissolve transition takes over */
+        .chat-messages-stream.rewinding .msg-row {
+          animation: none;
+        }
+
+        .msg-row.dissolving {
+          opacity: 0;
+          transform: translateY(-10px) scale(0.93);
+          filter: blur(5px);
         }
 
         @keyframes slideInMsg {
@@ -1359,6 +1387,16 @@ export default function RizzOnboarding() {
         }
 
         .chat-messages-stream.rewinding {
+          pointer-events: none !important;
+          overflow: hidden !important;
+        }
+
+        /* Hide intro text during rewind so it doesn't show when scroll reaches the top */
+        .chat-messages-stream.rewinding .intro-rizz-header-group {
+          display: none;
+        }
+
+        .chat-messages-stream.is-intro {
           pointer-events: none !important;
           overflow: hidden !important;
         }
@@ -1808,7 +1846,8 @@ export default function RizzOnboarding() {
             display: none;
           }
           .phone-screen {
-            padding-top: calc(12px + env(safe-area-inset-top, 12px));
+            /* On real mobile, don't add extra top padding — safe-area handles notch via chat-header */
+            padding-top: env(safe-area-inset-top, 0px);
           }
           /* Clean, notched spacing for header without exit button pushes */
           .chat-header {
@@ -1819,10 +1858,12 @@ export default function RizzOnboarding() {
           }
           /* Adjust safe-area paddings for inputs/keyboards at the bottom of notched screens */
           .chat-input-bar {
-            padding-bottom: calc(1rem + env(safe-area-inset-bottom, 12px));
+            padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
           }
           .custom-keyboard.visible {
-            padding-bottom: calc(1rem + env(safe-area-inset-bottom, 12px));
+            /* Extend height to include bottom safe area so there's no black gap below */
+            height: calc(275px + env(safe-area-inset-bottom, 0px));
+            padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
           }
         }
 
@@ -1910,7 +1951,6 @@ export default function RizzOnboarding() {
           onTouchEnd={handleIntroTouchEnd}
           onMouseDown={handleIntroMouseDown}
           onMouseUp={handleIntroMouseUp}
-          onClick={handleIntroClick}
         >
           
           {/* --- VCR Rewind Overlay --- */}
@@ -1978,12 +2018,14 @@ export default function RizzOnboarding() {
 
               {/* Message Stream */}
               <div 
-                className={`chat-messages-stream ${flowState === 'rewinding' ? 'rewinding' : ''}`} 
+                className={`chat-messages-stream ${flowState === 'rewinding' ? 'rewinding' : ''} ${['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''}`} 
                 ref={chatStreamRef} 
                 onScroll={handleScroll}
               >
                 {/* Profile Header (visible at the top of the chat scroll stream) */}
-                <div className={`chat-profile-header ${
+                <div 
+                  ref={profileHeaderRef}
+                  className={`chat-profile-header ${
                   flowState === 'intro-logo' ? 'at-logo' :
                   flowState === 'intro-rizz' ? 'at-rizz' :
                   flowState === 'intro-persona' ? 'at-persona' : 'at-chat'
@@ -2017,13 +2059,13 @@ export default function RizzOnboarding() {
                 {flowState === 'chat-jade' || flowState === 'chat-init' || flowState === 'rewinding' ? (
                   jadeMessages.map((m) => (
                     m.type === 'Sent' ? (
-                      <div key={m.id} className="msg-row sent">
+                      <div key={m.id} className={`msg-row sent${dissolvingIds.has(m.id) ? ' dissolving' : ''}`}>
                         <div className="msg-content-wrapper">
                           <div className="msg-bubble">{m.text}</div>
                         </div>
                       </div>
                     ) : (
-                      <div key={m.id} className="msg-row received-no-bubble">
+                      <div key={m.id} className={`msg-row received-no-bubble${dissolvingIds.has(m.id) ? ' dissolving' : ''}`}>
                         <div className="msg-received-header">
                           <img src="/RizzOnboarding/Assets/AvatarJade.png" alt="Jade" className="msg-avatar" />
                           {m.score !== undefined && (
@@ -2134,6 +2176,11 @@ export default function RizzOnboarding() {
                     value={inputText}
                     onChange={(e) => setInputText(e.target.value)}
                     autoFocus
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    data-form-type="other"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && inputText.trim()) {
                         handleSendJadeMessage();
