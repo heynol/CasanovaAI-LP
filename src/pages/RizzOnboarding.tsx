@@ -68,6 +68,16 @@ export default function RizzOnboarding() {
     flowStateRef.current = flowState;
   }, [flowState]);
 
+  // Lock down html/body to prevent any mobile scroll rubber-banding or bounce
+  useEffect(() => {
+    document.documentElement.classList.add('onboarding-html');
+    document.body.classList.add('onboarding-body');
+    return () => {
+      document.documentElement.classList.remove('onboarding-html');
+      document.body.classList.remove('onboarding-body');
+    };
+  }, []);
+
   // Jade Live API states
   const [jadeMessages, setJadeMessages] = useState<Message[]>([]);
   const [currentScore, setCurrentScore] = useState<number>(5.0);
@@ -86,9 +96,6 @@ export default function RizzOnboarding() {
 
   // Message dissolve IDs during rewind
   const [dissolvingIds, setDissolvingIds] = useState<Set<string>>(new Set());
-
-  // Dynamic Header show state on scroll
-  const [showStickyHeader, setShowStickyHeader] = useState<boolean>(false);
 
   const isKeyboardVisible = flowState === 'chat-chloe' && !isAwaitingAPI;
 
@@ -215,18 +222,51 @@ export default function RizzOnboarding() {
   // Pre-fetch Auth Token for Jade Live API during the Intro scroll sequence
   useEffect(() => {
     const fetchToken = async () => {
-      // Fallback to the public dev sandbox secret in production if build-time environment variables are omitted
       const devSecret = import.meta.env.VITE_DEV_AUTH_SECRET || 'NAOUfmUyQY9J0/xJUbN9vOQQ9VsGG7Vvy0XoYs57Ah8=';
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
       try {
-        let response;
+        let response = null;
+
+        // 1. Try local dev-token proxy first if running locally
         if (isLocal) {
-          // Try local dev proxy to bypass CORS
-          response = await fetch('/api/get-dev-token');
+          try {
+            response = await fetch('/api/get-dev-token');
+            if (response.ok) {
+              const contentType = response.headers.get('content-type') || '';
+              if (!contentType.includes('application/json')) {
+                response = null; // Returned HTML fallback from vercel rewrite
+              }
+            }
+          } catch (e) {
+            response = null;
+          }
         }
 
+        // 2. Try Vercel Serverless proxy in production (bypasses browser CORS completely!)
         if (!response || !response.ok) {
-          // Direct fallback to absolute URL in production since static hosting doesn't run the dev server proxy
+          try {
+            response = await fetch('/api-rizz/miscAuth/auth/dev/id-token', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Dev-Auth-Secret': devSecret,
+              },
+              body: JSON.stringify({ uid: 'dev-peter' }),
+            });
+            if (response.ok) {
+              const contentType = response.headers.get('content-type') || '';
+              if (!contentType.includes('application/json')) {
+                response = null; // Returned HTML fallback
+              }
+            }
+          } catch (e) {
+            response = null;
+          }
+        }
+
+        // 3. Absolute URL fallback if proxy routes are not configured or fail
+        if (!response || !response.ok) {
           response = await fetch('https://us-central1-casanova-ai-dev.cloudfunctions.net/miscAuth/auth/dev/id-token', {
             method: 'POST',
             headers: {
@@ -237,13 +277,15 @@ export default function RizzOnboarding() {
           });
         }
 
-        if (response.ok) {
+        if (response && response.ok) {
           const data = await response.json();
-          setApiToken(data.idToken);
-          console.log('Successfully pre-fetched dev idToken');
-        } else {
-          console.warn('Failed to pre-fetch token from server:', response.status);
+          if (data && data.idToken) {
+            setApiToken(data.idToken);
+            console.log('Successfully pre-fetched dev idToken');
+            return;
+          }
         }
+        console.warn('Failed to pre-fetch token from server');
       } catch (err) {
         console.error('Error pre-fetching token', err);
       }
@@ -369,11 +411,6 @@ export default function RizzOnboarding() {
     scrollToBottom();
   };
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const scrollTop = e.currentTarget.scrollTop;
-    setShowStickyHeader(scrollTop > 80);
-  };
-
   // --- iOS Keyboard Key Taps ---
   const handleKeyTap = (char: string) => {
     setInputText((prev) => prev + char);
@@ -420,25 +457,46 @@ export default function RizzOnboarding() {
 
     try {
       if (apiToken) {
-        // Send real API request
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const apiUrl = isLocal
-          ? '/api-rizz/rizzArena/onboarding/message'
-          : 'https://us-central1-casanova-ai-dev.cloudfunctions.net/rizzArena/onboarding/message';
-
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiToken}`,
-          },
-          body: JSON.stringify({
-            personaId: 'jade',
-            currentGlobalScore: currentScore,
-            messages: apiMessagesPayload,
-            languageCode: 'en',
-          }),
+        let response = null;
+        const payload = JSON.stringify({
+          personaId: 'jade',
+          currentGlobalScore: currentScore,
+          messages: apiMessagesPayload,
+          languageCode: 'en',
         });
+
+        // 1. Try Vercel Serverless proxy first (bypasses browser CORS completely!)
+        try {
+          const apiUrl = '/api-rizz/rizzArena/onboarding/message';
+          response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiToken}`,
+            },
+            body: payload,
+          });
+          if (response.ok) {
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+              response = null; // Returned HTML fallback (e.g. static hosting 404 falling back to index.html)
+            }
+          }
+        } catch (e) {
+          response = null;
+        }
+
+        // 2. Direct absolute fallback if proxy is missing/fails or doesn't support rewrites
+        if (!response || !response.ok) {
+          response = await fetch('https://us-central1-casanova-ai-dev.cloudfunctions.net/rizzArena/onboarding/message', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiToken}`,
+            },
+            body: payload,
+          });
+        }
 
         if (response.ok) {
           const data = await response.json();
@@ -658,6 +716,17 @@ export default function RizzOnboarding() {
     <div className="rizz-page-wrapper">
       {/* Dynamic Inject Style for Custom Animations & Layouts */}
       <style>{`
+        html.onboarding-html,
+        body.onboarding-body,
+        body.onboarding-body #root,
+        body.onboarding-body .app-container {
+          overflow: hidden !important;
+          height: 100% !important;
+          height: 100dvh !important;
+          width: 100% !important;
+          position: fixed !important;
+        }
+
         .rizz-page-wrapper {
           width: 100vw;
           height: 100vh;
@@ -1039,64 +1108,14 @@ export default function RizzOnboarding() {
           pointer-events: none;
         }
 
-        /* Chat Header */
-        .chat-header {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 60px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-          display: flex;
-          align-items: center;
-          padding: 0 1.25rem;
-          gap: 0.75rem;
-          background: rgba(6, 6, 8, 0.85);
-          backdrop-filter: blur(8px);
-          z-index: 30;
-          box-sizing: border-box;
-          transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .chat-header-avatar {
-          width: 38px;
-          height: 38px;
-          border-radius: 50%;
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          object-fit: cover;
-        }
-
-        .chat-header-info {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 0px;
-          line-height: 1.05;
-        }
-
-        .chat-header-name {
-          font-size: 1.05rem;
-          font-weight: 700;
+        /* Collapse profile header once intro is done — prevents scrolling up into intro content */
+        .chat-profile-header.at-chat {
+          height: 0;
+          overflow: hidden;
+          padding: 0;
           margin: 0;
-        }
-
-        .chat-header-status {
-          font-size: 0.75rem;
-          color: var(--accent-cyan);
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          margin: 0;
-        }
-
-        .chat-header-status::before {
-          content: '';
-          display: inline-block;
-          width: 6px;
-          height: 6px;
-          background: var(--accent-cyan);
-          border-radius: 50%;
-          box-shadow: 0 0 6px var(--accent-cyan);
+          min-height: 0;
+          transition: none;
         }
 
         /* Chat Messages Stream */
@@ -1881,16 +1900,9 @@ export default function RizzOnboarding() {
           .phone-island {
             display: none;
           }
+          /* On real mobile, apply safe-area top padding directly to the screen */
           .phone-screen {
-            /* On real mobile, don't add extra top padding — safe-area handles notch via chat-header */
             padding-top: env(safe-area-inset-top, 0px);
-          }
-          /* Clean, notched spacing for header without exit button pushes */
-          .chat-header {
-            height: calc(60px + env(safe-area-inset-top, 0px));
-            padding-top: env(safe-area-inset-top, 0px);
-            padding-left: calc(1.25rem + env(safe-area-inset-left, 0px));
-            padding-right: calc(1.25rem + env(safe-area-inset-right, 0px));
           }
           /* Adjust safe-area paddings for inputs/keyboards at the bottom of notched screens */
           .chat-input-bar {
@@ -2031,37 +2043,10 @@ export default function RizzOnboarding() {
 
           {/* --- STEPS 1-3: Chat streams (Jade Live API / Fallback OR Chloe Pre-written) --- */}
           <div className={`chat-container ${['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''}`}>
-              {/* Header */}
-              <div 
-                className="chat-header"
-                style={{
-                  opacity: (showStickyHeader && !['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) ? 1 : 0,
-                  transform: (showStickyHeader && !['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) ? 'translateY(0)' : 'translateY(-10px)',
-                  pointerEvents: (showStickyHeader && !['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) ? 'auto' : 'none'
-                }}
-              >
-                <img 
-                  src="/RizzOnboarding/Assets/AvatarJade.png" 
-                  alt="Avatar" 
-                  className="chat-header-avatar" 
-                />
-                <div className="chat-header-info">
-                  <div className="chat-header-name">Jade</div>
-                  <div className="chat-header-status">online</div>
-                </div>
-                <div className="header-score-container">
-                  <span className="rizz-label">Rizz:</span>
-                  <span className={`score-badge ${getScoreColorClass((flowState === 'chat-chloe' || flowState === 'success') ? chloeScore : currentScore)}`}>
-                    {((flowState === 'chat-chloe' || flowState === 'success') ? chloeScore : currentScore).toFixed(1)}/10
-                  </span>
-                </div>
-              </div>
-
-              {/* Message Stream */}
+              {/* Message Stream — no onScroll needed since sticky header is removed */}
               <div 
                 className={`chat-messages-stream ${flowState === 'rewinding' ? 'rewinding' : ''} ${['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''}`} 
                 ref={chatStreamRef} 
-                onScroll={handleScroll}
               >
                 {/* Profile Header (visible at the top of the chat scroll stream) */}
                 <div 
