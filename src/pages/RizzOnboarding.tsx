@@ -1547,6 +1547,13 @@ export default function RizzOnboarding() {
           pointer-events: auto;
         }
 
+        /* Prevent layout collapsing during Chloe's typing/waiting transitions */
+        .chat-container.chloe-active .custom-keyboard {
+          height: 275px;
+          padding: 1.25rem 0 1.75rem 0;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
         .kbd-glow-lottie-container {
           position: absolute;
           top: 0;
@@ -1908,6 +1915,10 @@ export default function RizzOnboarding() {
             height: calc(275px + env(safe-area-inset-bottom, 0px));
             padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
           }
+          .chat-container.chloe-active .custom-keyboard {
+            height: calc(275px + env(safe-area-inset-bottom, 0px));
+            padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+          }
           /* Lift fail/success cards above the home indicator */
           .fail-card,
           .success-gold-box {
@@ -2037,7 +2048,11 @@ export default function RizzOnboarding() {
           <div className={`bottom-peeking-glow ${['chat-init', 'chat-jade'].includes(flowState) ? 'active' : ''}`}></div>
 
           {/* --- STEPS 1-3: Chat streams (Jade Live API / Fallback OR Chloe Pre-written) --- */}
-          <div className={`chat-container ${['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''}`}>
+          <div className={`chat-container ${
+            ['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''
+          } ${
+            ['chat-chloe', 'success'].includes(flowState) ? 'chloe-active' : ''
+          }`}>
               {/* Message Stream — no onScroll needed since sticky header is removed */}
               <div 
                 className={`chat-messages-stream ${flowState === 'rewinding' ? 'rewinding' : ''} ${['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''}`} 
