@@ -1516,12 +1516,16 @@ export default function RizzOnboarding() {
         /* --- Simulated Custom Keyboard (Round 2) --- */
         /* --- Simulated Custom Keyboard (Round 2) --- */
         .custom-keyboard {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
           background: #060608;
-          border-top: 0px solid transparent;
-          height: 0;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          height: 275px;
           opacity: 0;
           transform: translateY(100%);
-          padding: 0;
+          padding: 1.25rem 0 1.75rem 0;
           box-sizing: border-box;
           overflow: hidden;
           display: flex;
@@ -1529,29 +1533,19 @@ export default function RizzOnboarding() {
           align-items: center;
           justify-content: space-between;
           z-index: 15;
-          position: relative;
           pointer-events: none;
-          transition: height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                      opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                      padding 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                      border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .custom-keyboard.visible {
-          height: 275px;
           opacity: 1;
           transform: translateY(0);
-          padding: 1.25rem 0 1.75rem 0;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
           pointer-events: auto;
         }
 
-        /* Prevent layout collapsing during Chloe's typing/waiting transitions */
-        .chat-container.chloe-active .custom-keyboard {
-          height: 275px;
-          padding: 1.25rem 0 1.75rem 0;
-          border-top: 1px solid rgba(255, 255, 255, 0.08);
+        .chat-container.chloe-active .chat-messages-stream {
+          padding-bottom: 290px; /* 275px keyboard height + 15px margin/breathing room */
         }
 
         .kbd-glow-lottie-container {
@@ -1910,14 +1904,13 @@ export default function RizzOnboarding() {
           .chat-input-bar {
             padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
           }
-          .custom-keyboard.visible {
+          .custom-keyboard {
             /* Extend height to include bottom safe area so there's no black gap below */
             height: calc(275px + env(safe-area-inset-bottom, 0px));
             padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
           }
-          .chat-container.chloe-active .custom-keyboard {
-            height: calc(275px + env(safe-area-inset-bottom, 0px));
-            padding-bottom: calc(1.75rem + env(safe-area-inset-bottom, 0px));
+          .chat-container.chloe-active .chat-messages-stream {
+            padding-bottom: calc(290px + env(safe-area-inset-bottom, 0px));
           }
           /* Lift fail/success cards above the home indicator */
           .fail-card,
@@ -2051,7 +2044,7 @@ export default function RizzOnboarding() {
           <div className={`chat-container ${
             ['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''
           } ${
-            ['chat-chloe', 'success'].includes(flowState) ? 'chloe-active' : ''
+            flowState === 'chat-chloe' ? 'chloe-active' : ''
           }`}>
               {/* Message Stream — no onScroll needed since sticky header is removed */}
               <div 
