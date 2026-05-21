@@ -1108,14 +1108,9 @@ export default function RizzOnboarding() {
           pointer-events: none;
         }
 
-        /* Collapse profile header once intro is done — prevents scrolling up into intro content */
-        .chat-profile-header.at-chat {
-          height: 0;
-          overflow: hidden;
-          padding: 0;
-          margin: 0;
-          min-height: 0;
-          transition: none;
+        /* Hide introductory header group once chat starts */
+        .intro-rizz-header-group.at-chat {
+          display: none;
         }
 
         /* Chat Messages Stream */
@@ -2060,7 +2055,8 @@ export default function RizzOnboarding() {
                   {/* Screen 2: Test your Rizz group */}
                   <div className={`intro-rizz-header-group ${
                     flowState === 'intro-logo' ? 'at-bottom' : 
-                    flowState === 'intro-rizz' ? 'centered' : 'top-faded'
+                    flowState === 'intro-rizz' ? 'centered' : 
+                    flowState === 'intro-persona' ? 'top-faded' : 'at-chat'
                   }`}>
                     <h2 className="intro-rizz-title">Test your Rizz</h2>
                     <p className="intro-rizz-sub">Can you close the deal?</p>
