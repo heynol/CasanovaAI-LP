@@ -1400,8 +1400,10 @@ export default function RizzOnboarding() {
           background: #ffffff;
           color: #000000;
           border: none;
-          font-weight: 700;
-          padding: 0.85rem;
+          font-weight: 800;
+          font-size: 1.05rem;
+          font-family: inherit;
+          padding: 0.95rem;
           border-radius: 100px;
           cursor: pointer;
           display: flex;
@@ -1861,6 +1863,8 @@ export default function RizzOnboarding() {
           color: #000000;
           border: none;
           font-weight: 800;
+          font-size: 1.05rem;
+          font-family: inherit;
           padding: 0.95rem;
           border-radius: 100px;
           cursor: pointer;
@@ -2204,6 +2208,11 @@ export default function RizzOnboarding() {
                     className="real-input"
                     contentEditable
                     suppressContentEditableWarning
+                    autoComplete="off"
+                    autoCorrect="on"
+                    autoCapitalize="sentences"
+                    spellCheck={true}
+                    enterKeyHint="send"
                     data-placeholder="Your turn. Don't mess it up..."
                     onInput={(e) => {
                       const text = (e.currentTarget as HTMLDivElement).textContent || '';
