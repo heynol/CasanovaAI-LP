@@ -1401,7 +1401,7 @@ export default function RizzOnboarding() {
           color: #000000;
           border: none;
           font-weight: 800;
-          font-size: 1.15rem;
+          font-size: 1.1rem;
           font-family: inherit;
           padding: 0.95rem;
           border-radius: 100px;
@@ -1863,7 +1863,7 @@ export default function RizzOnboarding() {
           color: #000000;
           border: none;
           font-weight: 800;
-          font-size: 1.15rem;
+          font-size: 1.1rem;
           font-family: inherit;
           padding: 0.95rem;
           border-radius: 100px;
