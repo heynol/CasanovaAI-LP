@@ -1013,7 +1013,7 @@ export default function RizzOnboarding() {
           position: absolute;
           width: 780px; /* 2 times screen width, allowing distinct circular edge */
           height: 780px;
-          background-image: url('/RizzOnboarding/Assets/Glow Green.png');
+          background-image: url('/RizzOnboarding/Assets/Glow Green.webp');
           background-size: cover;
           background-repeat: no-repeat;
           background-position: center center;
@@ -1390,7 +1390,7 @@ export default function RizzOnboarding() {
           left: 50%;
           width: 300%;
           height: 300%;
-          background-image: url('/RizzOnboarding/Assets/Glow Yellow.png');
+          background-image: url('/RizzOnboarding/Assets/Glow Yellow.webp');
           background-size: contain;
           background-repeat: no-repeat;
           background-position: center center;
