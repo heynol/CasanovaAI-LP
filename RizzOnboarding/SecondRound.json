@@ -302,137 +302,137 @@
             ]
         },
         "End_A1a": {
-            "chloe_message": "A spicy marg staring contest? You're on. 🌶️",
+            "chloe_message": "A spicy marg staring contest? Oh, you are on. Just so you know, I never blink when I'm locked in on something I want. See you Thursday. 😉🌶️",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_A1b": {
-            "chloe_message": "Better have some good rock on that jukebox. See you then.",
+            "chloe_message": "If your jukebox selection matches your tequila taste, we are in serious trouble. I can't wait to see if you can actually keep up. See you Thursday! 🥃🔥",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         },
         "End_A1c": {
-            "chloe_message": "I'll clear my Thursday. Clear my clearance. 😉",
+            "chloe_message": "Confidential clearance? I love a good mystery. Tell you what, buy me a shot on Thursday and I'll see if I can get you to spill all your secrets... 🤫",
             "chloe_delay_ms": 1300,
             "is_end_state": true
         },
         "End_A2a": {
-            "chloe_message": "Omakase it is. Don't disappoint me. 🍣",
+            "chloe_message": "Omakase it is. You've officially set the bar extremely high. If you play your cards right on Friday, maybe I'll let you choose dessert too... 🍣😏",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_A2b": {
-            "chloe_message": "A laundromat? Okay, I love a sketchy hidden gem. Deal.",
+            "chloe_message": "A laundromat? That is incredibly sketchy and I am absolutely obsessed. I can't stop thinking about what's behind that door. Friday is too far away! ✨",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         },
         "End_A2c": {
-            "chloe_message": "I'm trusting your tuna guy. Send me the spot.",
+            "chloe_message": "A secret tuna guy? Alright, you definitely know how to intrigue a girl. Thursday is officially locked in. Don't make me wait! 🍣🥂",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_A3a": {
-            "chloe_message": "Bad decisions on a rooftop sounds like my kind of Thursday. ✨",
+            "chloe_message": "Rooftop drinks and bad decisions? You're dangerous, I like it. I'm already picking out an outfit that matches that energy. See you Thursday night. 🔥",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         },
         "End_A3b": {
-            "chloe_message": "Three plot twists? Consider me invested. Send the address.",
+            "chloe_message": "Three plot twists? Consider me completely invested. If the first one is you kissing me before dessert, you might just win. Send the address! 💋✨",
             "chloe_delay_ms": 1300,
             "is_end_state": true
         },
         "End_A3c": {
-            "chloe_message": "Chapter one it is. Bring your best material.",
+            "chloe_message": "Writing chapter one on Friday? I'm already thinking about the sequel. Bring your absolute best material, because I plan on making this unforgettable.",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_B1a": {
-            "chloe_message": "We'll see if you keep that perfect record. Send the time.",
+            "chloe_message": "I'm about to ruin your perfect streak on Thursday, and you are going to love every second of it. Send the time, I'm ready. 😉",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         },
         "End_B1b": {
-            "chloe_message": "Espresso martinis? Okay, you found my weakness. Deal. 🍸",
+            "chloe_message": "Espresso martinis are my ultimate weakness, you cheat! If they're as good as your rizz, we might not want the night to end. Thursday it is. 🍸🔥",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_B1c": {
-            "chloe_message": "Schedule sent. Awaiting your flawless itinerary.",
+            "chloe_message": "Schedule sent. I haven't been this excited for an itinerary in a very long time. Show me what you've got! 🥂",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         },
         "End_B2a": {
-            "chloe_message": "Pizza at mine? Only if you actually win. We'll see.",
+            "chloe_message": "Pizza at mine? You are incredibly confident, but I'm not complaining. If you win, you get to stay for dessert. Challenge accepted. 😉🍕",
             "chloe_delay_ms": 1300,
             "is_end_state": true
         },
         "End_B2b": {
-            "chloe_message": "A cheese board I can handle. Challenge accepted. 🧀",
+            "chloe_message": "A curated cheese board and wine is the way to my heart. You're playing your cards beautifully. I can't wait for Thursday. 🧀🍇",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_B2c": {
-            "chloe_message": "I excel at sitting and looking pretty. See you Thursday.",
+            "chloe_message": "I'm exceptionally good at sitting and looking pretty, but you cooking for me? That is incredibly hot. Thursday is a date. See you then! 💋",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         },
         "End_B3a": {
-            "chloe_message": "I'll bring my notebook. Class better be good.",
+            "chloe_message": "A Mezcal Negroni masterclass? I'll be in the front row, taking very detailed notes. Class starts at 8 on Friday—don't keep your favorite student waiting. 😉",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_B3b": {
-            "chloe_message": "I always bring the enthusiasm. See you then.",
+            "chloe_message": "I always bring the enthusiasm, but you better deliver on that syllabus. I'm already thinking about what we'll do for extra credit. See you then!",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         },
         "End_B3c": {
-            "chloe_message": "Soho House it is. Don't be late for your own class. 🥂",
+            "chloe_message": "Soho House on Thursday? Immersive is my favorite way to learn. I'm already counting down the hours. Don't be late for your own class! 🥂",
             "chloe_delay_ms": 1300,
             "is_end_state": true
         },
         "End_C1a": {
-            "chloe_message": "I'm holding you to that. Send the reservation. 🍷",
+            "chloe_message": "I'm holding you to that promise. Send the reservation. If the wine is as good as your talk, it's going to be a very late night. 🍷😏",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_C1b": {
-            "chloe_message": "A Ph.D in wine? Okay Dr. Rizz, see you Thursday.",
+            "chloe_message": "A Ph.D in wine? Okay Dr. Rizz, I'm ready for my consultation on Thursday. I hope your bedside manner is as good as your wine selection. 😉",
             "chloe_delay_ms": 1300,
             "is_end_state": true
         },
         "End_C1c": {
-            "chloe_message": "Oh, I will absolutely roast you if it's bad. Deal.",
+            "chloe_message": "Oh, I will absolutely roast you in public if it's bad. But honestly? I'm hoping you blow me away. Thursday is locked in. 🍷",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         },
         "End_C2a": {
-            "chloe_message": "Hahah alright, let's see this famous jawline. Thursday morning.",
+            "chloe_message": "Hahah alright, let's see this famous jawline. If it's as sharp as your wit, 30 minutes might turn into the whole weekend. Thursday morning. ☕💋",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_C2b": {
-            "chloe_message": "I appreciate a good escape route. See you Thursday. ☕",
+            "chloe_message": "An escape route? I have a feeling neither of us is going to want to use it. I'm already looking forward to Thursday. See you then!",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         },
         "End_C2c": {
-            "chloe_message": "Bring the background check and a flat white. Deal.",
+            "chloe_message": "Bring the background check, and I'll bring the chemistry. Thursday morning is locked. Can't wait! ☕✨",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_C3a": {
-            "chloe_message": "Whispering secrets already? Send the pin. 🤫",
+            "chloe_message": "Whispering secrets in a dark corner already? You definitely know what a girl wants to hear. Send the pin, I'm so ready. 🤫🖤",
             "chloe_delay_ms": 1200,
             "is_end_state": true
         },
         "End_C3b": {
-            "chloe_message": "I'm definitely going to laugh. But okay, see you Friday.",
+            "chloe_message": "I'm 100% going to laugh and fail the test, but I can't wait to watch you charm the bouncer. Friday night is going to be epic. 🥂",
             "chloe_delay_ms": 1300,
             "is_end_state": true
         },
         "End_C3c": {
-            "chloe_message": "I love the confidence. I'll wear black. ✨",
+            "chloe_message": "I love a man who takes charge. I'll wear my favorite black dress, you bring the chemistry. Friday night can't come fast enough. ✨🖤",
             "chloe_delay_ms": 1100,
             "is_end_state": true
         }

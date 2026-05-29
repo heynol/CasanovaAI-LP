@@ -58,15 +58,21 @@ export default function RizzOnboarding() {
   };
 
   // State Machine: 
-  // 'intro-logo' -> 'intro-rizz' -> 'intro-persona' -> 'chat-init' -> 'chat-jade' -> 'rewinding' -> 'chat-chloe' -> 'success'
+  // 'intro-logo' -> 'intro-rizz' -> 'intro-swipe' -> 'intro-match' -> 'chat-init' -> 'chat-jade' -> 'rewinding' -> 'chat-chloe' -> 'success'
   const [flowState, setFlowState] = useState<
-    'intro-logo' | 'intro-rizz' | 'intro-persona' | 'chat-init' | 'chat-jade' | 'rewinding' | 'chat-chloe' | 'success'
+    'intro-logo' | 'intro-rizz' | 'intro-swipe' | 'intro-match' | 'chat-init' | 'chat-jade' | 'rewinding' | 'chat-chloe' | 'success'
   >('intro-logo');
 
   const flowStateRef = useRef(flowState);
   useEffect(() => {
     flowStateRef.current = flowState;
   }, [flowState]);
+
+  // Additional states for Tinder Swipe and Match sequences
+  const [typedSubline, setTypedSubline] = useState('');
+  const [isTypingSubline, setIsTypingSubline] = useState(false);
+  const [swipeClass, setSwipeClass] = useState<'hidden' | 'center' | 'tease-left' | 'tease-right' | 'swipe-left' | 'swipe-right'>('hidden');
+  const [matchStep, setMatchStep] = useState<number>(0);
 
   // Lock down html/body to prevent any mobile scroll rubber-banding or bounce
   useEffect(() => {
@@ -113,7 +119,7 @@ export default function RizzOnboarding() {
   const introTouchStartY = useRef<number | null>(null);
   const introMouseStartY = useRef<number | null>(null);
   const lastTransitionTimeRef = useRef<number>(0);
-  const introTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const introTimerRef = useRef<any>(null);
 
   const handleNextState = () => {
     const now = Date.now();
@@ -123,19 +129,21 @@ export default function RizzOnboarding() {
     if (flowState === 'intro-logo') {
       setFlowState('intro-rizz');
     } else if (flowState === 'intro-rizz') {
-      setFlowState('intro-persona');
-    } else if (flowState === 'intro-persona') {
+      setFlowState('intro-swipe');
+    } else if (flowState === 'intro-swipe') {
+      setFlowState('intro-match');
+    } else if (flowState === 'intro-match') {
       handleTransitionToChatInit();
     }
   };
 
   const handleIntroTouchStart = (e: React.TouchEvent) => {
-    if (!['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) return;
+    if (!['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) return;
     introTouchStartY.current = e.touches[0].clientY;
   };
 
   const handleIntroTouchEnd = (e: React.TouchEvent) => {
-    if (!['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) return;
+    if (!['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) return;
     if (introTouchStartY.current === null) return;
     // Prevent the browser from generating synthetic mouse/click events after touch
     e.preventDefault();
@@ -144,14 +152,14 @@ export default function RizzOnboarding() {
   };
 
   const handleIntroMouseDown = (e: React.MouseEvent) => {
-    if (!['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) return;
+    if (!['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) return;
     introMouseStartY.current = e.clientY;
   };
 
   // Consolidate into mouseUp only (no separate onClick) to prevent double-firing.
   // Fires for both taps (diffY ≈ 0) and swipes (diffY > threshold).
   const handleIntroMouseUp = (e: React.MouseEvent) => {
-    if (!['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) return;
+    if (!['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) return;
     if (introMouseStartY.current === null) return;
     introMouseStartY.current = null;
     handleNextState();
@@ -295,9 +303,9 @@ export default function RizzOnboarding() {
 
   // Auto-scroll chat to bottom
   const scrollToBottom = (instant = false) => {
-    if (['intro-logo', 'intro-rizz', 'intro-persona', 'rewinding'].includes(flowStateRef.current)) return;
+    if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowStateRef.current)) return;
     setTimeout(() => {
-      if (['intro-logo', 'intro-rizz', 'intro-persona', 'rewinding'].includes(flowStateRef.current)) return;
+      if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowStateRef.current)) return;
       if (chatStreamRef.current) {
         chatStreamRef.current.scrollTo({
           top: chatStreamRef.current.scrollHeight,
@@ -312,7 +320,7 @@ export default function RizzOnboarding() {
     const vv = window.visualViewport;
     if (!vv) return;
     const handleVVResize = () => {
-      if (['intro-logo', 'intro-rizz', 'intro-persona', 'rewinding'].includes(flowStateRef.current)) return;
+      if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowStateRef.current)) return;
       // Small delay to let the layout reflow settle after keyboard animation
       setTimeout(() => {
         if (chatStreamRef.current) {
@@ -329,7 +337,7 @@ export default function RizzOnboarding() {
 
   // Lock scroll to top during all intro states to prevent visual jumps
   useEffect(() => {
-    if (['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState)) {
+    if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) {
       if (chatStreamRef.current) {
         chatStreamRef.current.scrollTop = 0;
       }
@@ -343,9 +351,7 @@ export default function RizzOnboarding() {
     if (flowState === 'intro-logo') {
       introTimerRef.current = setTimeout(() => setFlowState('intro-rizz'), 3800);
     } else if (flowState === 'intro-rizz') {
-      introTimerRef.current = setTimeout(() => setFlowState('intro-persona'), 4000);
-    } else if (flowState === 'intro-persona') {
-      introTimerRef.current = setTimeout(() => handleTransitionToChatInit(), 4800);
+      introTimerRef.current = setTimeout(() => setFlowState('intro-swipe'), 4000);
     } else if (flowState === 'chat-init') {
       // 1. Initially show typing indicator (set Jade messages empty and typing to true)
       setIsAwaitingAPI(true);
@@ -382,6 +388,118 @@ export default function RizzOnboarding() {
     };
   }, [flowState]);
 
+  // Typewriter Effect for "Test your Rizz" subline
+  const fullSublineText = 'Can you close the deal?';
+  useEffect(() => {
+    if (flowState === 'intro-rizz') {
+      setTypedSubline('');
+      setIsTypingSubline(false);
+      
+      let interval: any = null;
+      const delayTimer = setTimeout(() => {
+        setIsTypingSubline(true);
+        let index = 0;
+        interval = setInterval(() => {
+          setTypedSubline(fullSublineText.substring(0, index + 1));
+          index++;
+          if (index >= fullSublineText.length) {
+            clearInterval(interval);
+            setIsTypingSubline(false);
+          }
+        }, 55); // 55ms per letter
+      }, 900); // 900ms delay to let the title settle in center first
+      
+      return () => {
+        clearTimeout(delayTimer);
+        if (interval) clearInterval(interval);
+      };
+    } else if (['intro-logo'].includes(flowState)) {
+      setTypedSubline('');
+      setIsTypingSubline(false);
+    } else {
+      setTypedSubline(fullSublineText);
+      setIsTypingSubline(false);
+    }
+  }, [flowState]);
+
+  // Tinder Swipe Animation Automated Sequence
+  useEffect(() => {
+    if (flowState === 'intro-swipe') {
+      setSwipeClass('center');
+      
+      // 1. Tease Left (red stamp) at 900ms
+      const teaseTimer = setTimeout(() => {
+        setSwipeClass('tease-left');
+      }, 900);
+
+      // 2. Recover to center at 2100ms
+      const recoverTimer = setTimeout(() => {
+        setSwipeClass('center');
+      }, 2100);
+
+      // 3. Swipe Right (green stamp & flies off-screen) at 2900ms
+      const swipeTimer = setTimeout(() => {
+        setSwipeClass('swipe-right');
+      }, 2900);
+
+      // 4. Transition to Match screen at 3900ms
+      const transitionTimer = setTimeout(() => {
+        setFlowState('intro-match');
+      }, 3900);
+
+      return () => {
+        clearTimeout(teaseTimer);
+        clearTimeout(recoverTimer);
+        clearTimeout(swipeTimer);
+        clearTimeout(transitionTimer);
+      };
+    } else {
+      setSwipeClass('hidden');
+    }
+  }, [flowState]);
+
+  // Tinder Match Screen delayed one-by-one entries
+  useEffect(() => {
+    if (flowState === 'intro-match') {
+      setMatchStep(0);
+      
+      // Step 1: Slide up profile photo (matchStep = 1) at 100ms
+      const timer1 = setTimeout(() => {
+        setMatchStep(1);
+      }, 100);
+
+      // Step 2: "You matched with Jade" pill (matchStep = 2) at 1200ms
+      const timer2 = setTimeout(() => {
+        setMatchStep(2);
+      }, 1200);
+
+      // Step 3: Bio text (matchStep = 3) at 2500ms
+      const timer3 = setTimeout(() => {
+        setMatchStep(3);
+      }, 2500);
+
+      // Step 4: Instructions capsule (matchStep = 4) at 3800ms
+      const timer4 = setTimeout(() => {
+        setMatchStep(4);
+      }, 3800);
+
+      // Step 5: Automatically transition to chat-init at 6500ms
+      const timer5 = setTimeout(() => {
+        handleTransitionToChatInit();
+      }, 6500);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+        clearTimeout(timer4);
+        clearTimeout(timer5);
+      };
+    } else {
+      setMatchStep(0);
+    }
+  }, [flowState]);
+
   // Control Lottie ColorGlow playback in simulated keyboard
   useEffect(() => {
     if (kbdGlowRef.current) {
@@ -395,10 +513,10 @@ export default function RizzOnboarding() {
 
   // Keep scroll at bottom when keyboard shows/hides
   useEffect(() => {
-    if (['intro-logo', 'intro-rizz', 'intro-persona', 'rewinding'].includes(flowState)) return;
+    if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowState)) return;
     scrollToBottom();
     const timer = setTimeout(() => {
-      if (['intro-logo', 'intro-rizz', 'intro-persona', 'rewinding'].includes(flowState)) return;
+      if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowState)) return;
       scrollToBottom();
     }, 400);
     return () => clearTimeout(timer);
@@ -700,7 +818,7 @@ export default function RizzOnboarding() {
         // Transition to golden success card
         setFlowState('success');
       }
-    }, nextNode.chloe_delay_ms || 1500);
+    }, Math.max(nextNode.chloe_delay_ms || 1500, 3200));
   };
 
   const restartFlow = () => {
@@ -988,8 +1106,8 @@ export default function RizzOnboarding() {
           opacity: 0.5;
         }
 
-        /* Persona Profile - Direct Canvas Integration */
-        .profile-card {
+        /* Tinder Match Card Wrapper Styles */
+        .tinder-match-card-wrapper {
           width: 100%;
           background: transparent;
           border: none;
@@ -1002,13 +1120,13 @@ export default function RizzOnboarding() {
           will-change: opacity, transform;
         }
 
-        .profile-card.pushed-down {
+        .tinder-match-card-wrapper.pushed-down {
           opacity: 0;
           transform: translate3d(0, 140px, 0); /* Beautiful sliding offset to add distance during entry */
           pointer-events: none;
         }
 
-        .profile-card.in-view {
+        .tinder-match-card-wrapper.in-view {
           opacity: 1;
           transform: translate3d(0, 0, 0);
           pointer-events: auto;
@@ -1489,13 +1607,18 @@ export default function RizzOnboarding() {
         .vcr-label {
           font-family: 'Courier New', monospace;
           color: #00ff00;
-          font-size: 1.5rem;
+          font-size: 1.8rem;
           font-weight: 700;
           text-shadow: 0 0 8px #00ff00;
           z-index: 203;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.75rem;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          white-space: nowrap;
         }
 
         .vcr-label.blink {
@@ -1989,6 +2112,386 @@ export default function RizzOnboarding() {
           color: #060608;
           box-shadow: 0 0 10px rgba(66, 239, 188, 0.25);
         }
+
+        /* Typewriter Cursor */
+        .typing-cursor {
+          animation: blink 0.8s step-end infinite;
+          color: #48CEC8;
+          font-weight: 300;
+          margin-left: 2px;
+        }
+
+        @keyframes blink {
+          50% { opacity: 0; }
+        }
+
+        /* Tinder Profile Card Simulator */
+        .tinder-card-container {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -48%);
+          width: 88%;
+          height: 490px;
+          perspective: 1000px;
+          z-index: 30;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          pointer-events: none;
+          animation: scaleInCard 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes scaleInCard {
+          from { opacity: 0; transform: translate(-50%, -48%) scale(0.8); }
+          to { opacity: 1; transform: translate(-50%, -48%) scale(1); }
+        }
+
+        .tinder-card {
+          width: 100%;
+          height: 100%;
+          background: #111113;
+          border-radius: 28px;
+          overflow: hidden;
+          box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          position: relative;
+          transform-origin: bottom center;
+          transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1), opacity 0.7s ease;
+          will-change: transform, opacity;
+        }
+
+        .tinder-card-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .tinder-card-overlay {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 55%;
+          background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0) 100%);
+          pointer-events: none;
+        }
+
+        .tinder-card-info {
+          position: absolute;
+          bottom: 24px;
+          left: 20px;
+          right: 20px;
+          z-index: 2;
+          text-align: left;
+        }
+
+        .tinder-card-name {
+          font-size: 1.45rem;
+          font-weight: 800;
+          color: #ffffff;
+          margin: 0;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          letter-spacing: -0.01em;
+        }
+
+        .tinder-card-age {
+          font-weight: 400;
+          opacity: 0.9;
+        }
+
+        .tinder-card-bio-teaser {
+          font-size: 0.82rem;
+          color: rgba(255, 255, 255, 0.75);
+          margin: 6px 0 0 0;
+          line-height: 1.35;
+        }
+
+        .tinder-card-metrics {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.75rem;
+          color: #42efbc;
+          margin-top: 10px;
+          font-weight: 600;
+        }
+
+        .tinder-metric-dot {
+          width: 6px;
+          height: 6px;
+          background-color: #42efbc;
+          border-radius: 50%;
+          box-shadow: 0 0 8px #42efbc;
+          animation: pulseMetric 1.5s infinite alternate;
+        }
+
+        @keyframes pulseMetric {
+          0% { opacity: 0.6; }
+          100% { opacity: 1; }
+        }
+
+        .tinder-stamp {
+          position: absolute;
+          top: 35px;
+          border: 4px solid;
+          border-radius: 8px;
+          padding: 4px 14px;
+          font-size: 1.8rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          opacity: 0;
+          transform: scale(1.3);
+          transition: opacity 0.25s ease, transform 0.25s ease;
+          z-index: 5;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .tinder-stamp.nope {
+          right: 25px;
+          color: #ff0844;
+          border-color: #ff0844;
+          transform: rotate(15deg) scale(1.1);
+          box-shadow: 0 0 15px rgba(255, 8, 68, 0.2);
+        }
+
+        .tinder-stamp.like {
+          left: 25px;
+          color: #42efbc;
+          border-color: #42efbc;
+          transform: rotate(-15deg) scale(1.1);
+          box-shadow: 0 0 15px rgba(66, 239, 188, 0.25);
+        }
+
+        /* Tinder Animation States */
+        .tinder-card.tease-left {
+          transform: translate3d(-30px, 4px, 0) rotate(-5deg);
+        }
+        .tinder-card.tease-left .tinder-stamp.nope {
+          opacity: 1;
+          transform: rotate(15deg) scale(1);
+        }
+
+        .tinder-card.tease-right {
+          transform: translate3d(30px, 4px, 0) rotate(5deg);
+        }
+        .tinder-card.tease-right .tinder-stamp.like {
+          opacity: 1;
+          transform: rotate(-15deg) scale(1);
+        }
+
+        .tinder-card.swipe-right {
+          transform: translate3d(450px, -20px, 0) rotate(20deg) scale(0.9);
+          opacity: 0;
+          transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s ease;
+        }
+        .tinder-card.swipe-right .tinder-stamp.like {
+          opacity: 1;
+          transform: rotate(-15deg) scale(1);
+        }
+
+        .tinder-card.swipe-left {
+          transform: translate3d(-450px, -20px, 0) rotate(-20deg) scale(0.9);
+          opacity: 0;
+          transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s ease;
+        }
+        .tinder-card.swipe-left .tinder-stamp.nope {
+          opacity: 1;
+          transform: rotate(15deg) scale(1);
+        }
+
+        /* Tinder Match Screen */
+        .tinder-match-screen {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          box-sizing: border-box;
+          padding: 2.25rem 1.5rem;
+          z-index: 25;
+          background: #060608;
+          overflow: hidden;
+        }
+
+        .match-stars-glow {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(circle at center, rgba(255, 8, 68, 0.15) 0%, rgba(6, 6, 8, 0) 70%);
+          z-index: 1;
+          pointer-events: none;
+          animation: floatGlow 3s infinite alternate;
+        }
+
+        @keyframes floatGlow {
+          0% { opacity: 0.7; transform: scale(0.95); }
+          100% { opacity: 1.0; transform: scale(1.05); }
+        }
+
+        .match-title-overlay {
+          font-family: 'Outfit', 'Inter', sans-serif;
+          font-weight: 900;
+          font-size: 2.3rem;
+          background: linear-gradient(135deg, #ff0844 0%, #ff4e50 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin-bottom: 0.5rem;
+          text-align: center;
+          letter-spacing: -0.02em;
+          z-index: 2;
+          opacity: 0;
+          transform: scale(0.85);
+          transition: opacity 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+          filter: drop-shadow(0 0 10px rgba(255, 8, 68, 0.25));
+        }
+
+        .match-title-overlay.in {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        .match-avatar-wrapper {
+          opacity: 0;
+          transform: translate3d(0, 80px, 0) scale(0.9);
+          transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+          margin-bottom: 1.5rem;
+          z-index: 2;
+          will-change: opacity, transform;
+        }
+
+        .match-avatar-wrapper.in {
+          opacity: 1;
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+
+        .match-avatar-glow {
+          box-shadow: 0 0 40px rgba(255, 8, 68, 0.45), 0 0 80px rgba(255, 8, 68, 0.25) !important;
+          border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .matched-sticker {
+          position: absolute;
+          top: 86%;
+          left: 50%;
+          transform: translate(-50%, -50%) rotate(-12deg) scale(0);
+          background: linear-gradient(135deg, #ff0844 0%, #ff4e50 100%);
+          color: #ffffff;
+          font-size: 1.05rem;
+          font-weight: 900;
+          padding: 6px 18px;
+          border-radius: 100px;
+          border: 2.5px solid #ffffff;
+          box-shadow: 0 8px 20px rgba(255, 8, 68, 0.4), 0 0 15px rgba(255, 8, 68, 0.3);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          z-index: 10;
+          white-space: nowrap;
+          animation: popInSticker 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+          animation-delay: 0.6s;
+          will-change: transform;
+        }
+
+        @keyframes popInSticker {
+          to {
+            transform: translate(-50%, -50%) rotate(-12deg) scale(1);
+          }
+        }
+
+        .match-pill {
+          opacity: 0;
+          transform: translate3d(0, 15px, 0);
+          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          background: rgba(66, 239, 188, 0.12);
+          border: 1px solid rgba(66, 239, 188, 0.25);
+          border-radius: 100px;
+          padding: 6px 16px;
+          font-size: 0.82rem;
+          font-weight: 700;
+          color: #42efbc;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 1.5rem;
+          box-shadow: 0 0 15px rgba(66, 239, 188, 0.1);
+          z-index: 2;
+          will-change: opacity, transform;
+        }
+
+        .match-pill.in {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
+
+        .match-pill-icon {
+          animation: matchPulse 1.2s infinite alternate;
+        }
+
+        @keyframes matchPulse {
+          0% { transform: scale(0.9); opacity: 0.8; }
+          100% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .match-bio-box {
+          opacity: 0;
+          transform: translate3d(0, 15px, 0);
+          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          width: 100%;
+          text-align: center;
+          margin-bottom: 1.5rem;
+          z-index: 2;
+          will-change: opacity, transform;
+        }
+
+        .match-bio-box.in {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
+
+        .match-bio-header {
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: #ff0844;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          margin-bottom: 0.4rem;
+        }
+
+        .match-bio-text {
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.95);
+          line-height: 1.45;
+          margin: 0;
+          padding: 0 1rem;
+        }
+
+        .match-prompt-capsule {
+          opacity: 0;
+          transform: translate3d(0, 15px, 0);
+          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          padding: 10px 16px;
+          font-size: 0.8rem;
+          color: rgba(255, 255, 255, 0.85);
+          line-height: 1.4;
+          text-align: center;
+          max-width: 90%;
+          font-style: italic;
+          z-index: 2;
+          will-change: opacity, transform;
+        }
+
+        .match-prompt-capsule.in {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
       `}</style>
 
       {/* Ambient background decoration */}
@@ -2002,7 +2505,7 @@ export default function RizzOnboarding() {
         <div className="phone-island"></div>
 
         <div 
-          className={`phone-screen ${['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''}`}
+          className={`phone-screen ${['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState) ? 'is-intro' : ''}`}
           onTouchStart={handleIntroTouchStart}
           onTouchEnd={handleIntroTouchEnd}
           onMouseDown={handleIntroMouseDown}
@@ -2044,15 +2547,46 @@ export default function RizzOnboarding() {
           {/* Peeking bottom yellow/gold glow effect (Moved to background of phone-screen) */}
           <div className={`bottom-peeking-glow ${['chat-init', 'chat-jade'].includes(flowState) ? 'active' : ''}`}></div>
 
+          {/* Radial match stars glow visible during match step */}
+          {flowState === 'intro-match' && <div className="match-stars-glow"></div>}
+
+          {/* --- Tinder Swipe Card Overlay --- */}
+          {flowState === 'intro-swipe' && (
+            <div className="tinder-card-container">
+              <div className={`tinder-card ${swipeClass}`}>
+                <img src="/RizzOnboarding/Assets/AvatarJade.png" alt="Jade" className="tinder-card-img" />
+                <div className="tinder-card-overlay"></div>
+                
+                {/* Tinder Stamps */}
+                <div className="tinder-stamp nope">NOPE</div>
+                <div className="tinder-stamp like">LIKE</div>
+                
+                {/* Tinder Info overlay */}
+                <div className="tinder-card-info">
+                  <h3 className="tinder-card-name">
+                    Jade, <span className="tinder-card-age">21</span>
+                  </h3>
+                  <p className="tinder-card-bio-teaser">
+                    "Fluent in sarcasm. Spotify wrapped judge..."
+                  </p>
+                  <div className="tinder-card-metrics">
+                    <span className="tinder-metric-dot"></span>
+                    Active Today • 98% Rizz Match
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* --- STEPS 1-3: Chat streams (Jade Live API / Fallback OR Chloe Pre-written) --- */}
           <div className={`chat-container ${
-            ['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''
+            ['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState) ? 'is-intro' : ''
           } ${
             flowState === 'chat-chloe' ? 'chloe-active' : ''
           }`}>
               {/* Message Stream — no onScroll needed since sticky header is removed */}
               <div 
-                className={`chat-messages-stream ${flowState === 'rewinding' ? 'rewinding' : ''} ${['intro-logo', 'intro-rizz', 'intro-persona'].includes(flowState) ? 'is-intro' : ''}`} 
+                className={`chat-messages-stream ${flowState === 'rewinding' ? 'rewinding' : ''} ${['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState) ? 'is-intro' : ''}`} 
                 ref={chatStreamRef} 
               >
                 {/* Profile Header (visible at the top of the chat scroll stream) */}
@@ -2061,30 +2595,54 @@ export default function RizzOnboarding() {
                   className={`chat-profile-header ${
                   flowState === 'intro-logo' ? 'at-logo' :
                   flowState === 'intro-rizz' ? 'at-rizz' :
-                  flowState === 'intro-persona' ? 'at-persona' : 'at-chat'
+                  ['intro-swipe', 'intro-match'].includes(flowState) ? 'at-persona' : 'at-chat'
                 }`}>
                   
                   {/* Screen 2: Test your Rizz group */}
                   <div className={`intro-rizz-header-group ${
                     flowState === 'intro-logo' ? 'at-bottom' : 
-                    flowState === 'intro-rizz' ? 'centered' : 
-                    flowState === 'intro-persona' ? 'top-faded' : 'at-chat'
+                    flowState === 'intro-rizz' ? 'centered' : 'at-chat'
                   }`}>
                     <h2 className="intro-rizz-title">Test your Rizz</h2>
-                    <p className="intro-rizz-sub">Can you close the deal?</p>
+                    <p className="intro-rizz-sub">
+                      {typedSubline}
+                      {isTypingSubline && <span className="typing-cursor">|</span>}
+                    </p>
                   </div>
                   
-                  {/* Screen 3: Profile Card */}
-                  <div className={`profile-card ${['intro-logo', 'intro-rizz'].includes(flowState) ? 'pushed-down' : 'in-view'}`}>
-                    <div className="avatar-glow-container">
-                      <img src="/RizzOnboarding/Assets/AvatarJade.png" alt="Jade Avatar" className="avatar-img" />
+                  {/* Tinder-style Match Header & Card merged directly inside the chat flow */}
+                  <div className={`tinder-match-card-wrapper ${['intro-logo', 'intro-rizz', 'intro-swipe'].includes(flowState) ? 'pushed-down' : 'in-view'}`}>
+                    
+                    {/* Glowing Match Title */}
+                    <div className={`match-title-overlay ${matchStep >= 1 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
+                      It's a Match!
                     </div>
-                    <h3 className="profile-name">Jade</h3>
-                    <p className="profile-bio">
-                      "I judge you by your Spotify wrapped and your cocktail order. Fluent in sarcasm. If your first message is just 'hey,' I'm already asleep."
-                    </p>
-                    <div className="profile-prompt-capsule">
-                      You matched with Jade. Show her what you got to seal the deal and get a date.
+
+                    {/* Step 1: Avatar slides up with Matched! sticker */}
+                    <div className={`match-avatar-wrapper ${matchStep >= 1 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
+                      <div className="avatar-glow-container match-avatar-glow">
+                        <img src="/RizzOnboarding/Assets/AvatarJade.png" alt="Jade Avatar" className="avatar-img" />
+                        <div className="matched-sticker">Matched!</div>
+                      </div>
+                    </div>
+
+                    {/* Step 2: "You matched with Jade" Pill */}
+                    <div className={`match-pill ${matchStep >= 2 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
+                      <Sparkles size={14} className="match-pill-icon" />
+                      You matched with Jade
+                    </div>
+
+                    {/* Step 3: Bio Text */}
+                    <div className={`match-bio-box ${matchStep >= 3 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
+                      <div className="match-bio-header">Bio:</div>
+                      <p className="match-bio-text">
+                        "I judge you by your Spotify wrapped and your cocktail order. Fluent in sarcasm. If your first message is just 'hey,' I'm already asleep."
+                      </p>
+                    </div>
+
+                    {/* Step 4: Prompt/Instructions Capsule */}
+                    <div className={`match-prompt-capsule ${matchStep >= 4 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
+                      Show her what you got to seal the deal and get a date.
                     </div>
                   </div>
                 </div>
@@ -2106,7 +2664,7 @@ export default function RizzOnboarding() {
                             <div className="msg-score-container">
                               <span className="rizz-label">Rizz:</span>
                               <span className={`score-badge ${getScoreColorClass(m.score)}`}>
-                                {m.score.toFixed(1)}/10
+                                {m.score >= 8.0 && '🔥 '}{m.score.toFixed(1)}/10
                               </span>
                             </div>
                           )}
@@ -2132,7 +2690,7 @@ export default function RizzOnboarding() {
                             <div className="msg-score-container">
                               <span className="rizz-label">Rizz:</span>
                               <span className={`score-badge ${getScoreColorClass(m.score)}`}>
-                                {m.score.toFixed(1)}/10
+                                {m.score >= 8.0 && '🔥 '}{m.score.toFixed(1)}/10
                               </span>
                             </div>
                           )}
@@ -2174,7 +2732,7 @@ export default function RizzOnboarding() {
                     Your manual replies didn't hit the mark. Jade got bored and matches are slipping away...
                   </p>
                   <button className="fail-btn" onClick={handleVcrRewind}>
-                    <RotateCcw size={16} /> Let's Do Over with AI Wingman
+                    <RotateCcw size={16} /> Let’s try again with AI
                   </button>
                 </div>
               )}
@@ -2182,7 +2740,9 @@ export default function RizzOnboarding() {
               {/* Golden Success Card (Round 2 End) */}
               {flowState === 'success' && (
                 <div className="success-gold-box">
-                  <div className="success-score-badge">{chloeScore.toFixed(1)} / 10</div>
+                  <div className="success-score-badge">
+                    {chloeScore >= 8.0 && '🔥 '}{chloeScore.toFixed(1)} / 10
+                  </div>
                   <h4 className="success-title">Vibe Secured!</h4>
                   <p className="success-desc">
                     Outstanding match performance. AI-generated options bypassed obstacles and secured the date.
