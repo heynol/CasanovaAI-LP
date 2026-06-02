@@ -830,6 +830,20 @@ export default function RizzOnboarding() {
     setFlowState('intro-logo');
   };
 
+  const handleSuccessCtaClick = () => {
+    const destination = "https://onboarding.getcasanova.ai/pz4-mr0l-g44";
+    try {
+      const currentParams = new URLSearchParams(window.location.search);
+      const url = new URL(destination);
+      currentParams.forEach((value, key) => {
+        url.searchParams.set(key, value);
+      });
+      window.location.href = url.toString();
+    } catch (e) {
+      window.location.href = destination;
+    }
+  };
+
   return (
     <div className="rizz-page-wrapper">
       {/* Dynamic Inject Style for Custom Animations & Layouts */}
@@ -2747,7 +2761,7 @@ export default function RizzOnboarding() {
                   <p className="success-desc">
                     Outstanding match performance. AI-generated options bypassed obstacles and secured the date.
                   </p>
-                  <button className="success-cta" onClick={restartFlow}>
+                  <button className="success-cta" onClick={handleSuccessCtaClick}>
                     <Sparkles size={16} /> Let AI message for you
                   </button>
                 </div>
