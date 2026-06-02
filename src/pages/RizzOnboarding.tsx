@@ -2585,7 +2585,7 @@ export default function RizzOnboarding() {
                   </p>
                   <div className="tinder-card-metrics">
                     <span className="tinder-metric-dot"></span>
-                    Active Today • 98% Rizz Match
+                    Active Today
                   </div>
                 </div>
               </div>
