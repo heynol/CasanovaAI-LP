@@ -437,19 +437,25 @@ export default function RizzOnboarding() {
         setSwipeClass('center');
       }, 2100);
 
-      // 3. Swipe Right (green stamp & flies off-screen) at 2900ms
-      const swipeTimer = setTimeout(() => {
-        setSwipeClass('swipe-right');
+      // 3. Tease Right (green stamp & pause) at 2900ms
+      const teaseRightTimer = setTimeout(() => {
+        setSwipeClass('tease-right');
       }, 2900);
 
-      // 4. Transition to Match screen at 3900ms
+      // 4. Swipe Right (green stamp & flies off-screen) at 4100ms
+      const swipeTimer = setTimeout(() => {
+        setSwipeClass('swipe-right');
+      }, 4100);
+
+      // 5. Transition to Match screen at 5100ms
       const transitionTimer = setTimeout(() => {
         setFlowState('intro-match');
-      }, 3900);
+      }, 5100);
 
       return () => {
         clearTimeout(teaseTimer);
         clearTimeout(recoverTimer);
+        clearTimeout(teaseRightTimer);
         clearTimeout(swipeTimer);
         clearTimeout(transitionTimer);
       };
@@ -2337,7 +2343,7 @@ export default function RizzOnboarding() {
           position: absolute;
           width: 100%;
           height: 100%;
-          background: radial-gradient(circle at center, rgba(255, 8, 68, 0.15) 0%, rgba(6, 6, 8, 0) 70%);
+          background: radial-gradient(circle at center, rgba(212, 163, 89, 0.15) 0%, rgba(6, 6, 8, 0) 70%);
           z-index: 1;
           pointer-events: none;
           animation: floatGlow 3s infinite alternate;
@@ -2352,7 +2358,7 @@ export default function RizzOnboarding() {
           font-family: 'Outfit', 'Inter', sans-serif;
           font-weight: 900;
           font-size: 2.3rem;
-          background: linear-gradient(135deg, #ff0844 0%, #ff4e50 100%);
+          background: linear-gradient(135deg, #FFE0A3 0%, #D4A359 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           margin-bottom: 0.5rem;
@@ -2362,7 +2368,7 @@ export default function RizzOnboarding() {
           opacity: 0;
           transform: scale(0.85);
           transition: opacity 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-          filter: drop-shadow(0 0 10px rgba(255, 8, 68, 0.25));
+          filter: drop-shadow(0 0 10px rgba(212, 163, 89, 0.25));
         }
 
         .match-title-overlay.in {
@@ -2385,7 +2391,7 @@ export default function RizzOnboarding() {
         }
 
         .match-avatar-glow {
-          box-shadow: 0 0 40px rgba(255, 8, 68, 0.45), 0 0 80px rgba(255, 8, 68, 0.25) !important;
+          box-shadow: 0 0 40px rgba(212, 163, 89, 0.45), 0 0 80px rgba(212, 163, 89, 0.25) !important;
           border: 3px solid rgba(255, 255, 255, 0.1);
         }
 
@@ -2394,14 +2400,14 @@ export default function RizzOnboarding() {
           top: 86%;
           left: 50%;
           transform: translate(-50%, -50%) rotate(-12deg) scale(0);
-          background: linear-gradient(135deg, #ff0844 0%, #ff4e50 100%);
-          color: #ffffff;
+          background: linear-gradient(135deg, #FFE0A3 0%, #D4A359 100%);
+          color: #060608;
           font-size: 1.05rem;
           font-weight: 900;
           padding: 6px 18px;
           border-radius: 100px;
           border: 2.5px solid #ffffff;
-          box-shadow: 0 8px 20px rgba(255, 8, 68, 0.4), 0 0 15px rgba(255, 8, 68, 0.3);
+          box-shadow: 0 8px 20px rgba(212, 163, 89, 0.4), 0 0 15px rgba(212, 163, 89, 0.3);
           text-transform: uppercase;
           letter-spacing: 0.05em;
           z-index: 10;
@@ -2470,7 +2476,7 @@ export default function RizzOnboarding() {
         .match-bio-header {
           font-size: 0.72rem;
           font-weight: 800;
-          color: #ff0844;
+          color: #D4A359;
           text-transform: uppercase;
           letter-spacing: 0.15em;
           margin-bottom: 0.4rem;
