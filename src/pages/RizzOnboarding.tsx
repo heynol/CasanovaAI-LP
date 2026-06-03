@@ -56,19 +56,6 @@ export default function RizzOnboarding() {
     trackEvent('Onboarding Start');
   }, []);
 
-  // Track Fail Screen Shown
-  useEffect(() => {
-    if (flowState === 'chat-jade' && apiInteractionCount >= 3 && !isAwaitingAPI) {
-      if (!hasTrackedFailRef.current) {
-        trackEvent('Onboarding Fail Screen Shown', {
-          score: currentScore
-        });
-        hasTrackedFailRef.current = true;
-      }
-    } else if (flowState !== 'chat-jade' || apiInteractionCount < 3) {
-      hasTrackedFailRef.current = false;
-    }
-  }, [flowState, apiInteractionCount, isAwaitingAPI, currentScore]);
 
   const getScoreColorClass = (score: number) => {
     if (score === 5.0) return 'score-grey';
@@ -142,6 +129,20 @@ export default function RizzOnboarding() {
   const introMouseStartY = useRef<number | null>(null);
   const lastTransitionTimeRef = useRef<number>(0);
   const introTimerRef = useRef<any>(null);
+
+  // Track Fail Screen Shown
+  useEffect(() => {
+    if (flowState === 'chat-jade' && apiInteractionCount >= 3 && !isAwaitingAPI) {
+      if (!hasTrackedFailRef.current) {
+        trackEvent('Onboarding Fail Screen Shown', {
+          score: currentScore
+        });
+        hasTrackedFailRef.current = true;
+      }
+    } else if (flowState !== 'chat-jade' || apiInteractionCount < 3) {
+      hasTrackedFailRef.current = false;
+    }
+  }, [flowState, apiInteractionCount, isAwaitingAPI, currentScore]);
 
   const handleNextState = () => {
     const now = Date.now();
