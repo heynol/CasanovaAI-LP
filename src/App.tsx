@@ -12,6 +12,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import RizzOnboarding from './pages/RizzOnboarding';
+import { trackEvent } from './mixpanel';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -211,7 +212,15 @@ function Features() {
               <div key={i} className={`flex items-center gap-12 feature-container ${f.reverse ? 'flex-row-reverse' : ''}`} style={{ flexWrap: 'wrap', position: 'relative' }}>
                 <img src={f.glow} alt="" className="feature-glow" />
                 <div style={{ flex: 1, minWidth: '300px' }}>
-                  <div className="glass-card" style={{ padding: '3rem', border: `1px solid ${f.colorBorder}` }}>
+                  <div 
+                    className="glass-card" 
+                    style={{ padding: '3rem', border: `1px solid ${f.colorBorder}`, cursor: f.title === 'Rizz Arena' ? 'pointer' : 'default' }}
+                    onClick={() => {
+                      if (f.title === 'Rizz Arena') {
+                        trackEvent('Rizz Arena Click');
+                      }
+                    }}
+                  >
                     <div style={{ width: '80px', height: '80px', borderRadius: '20px', background: f.colorBg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', border: `1px solid ${f.colorBorder}` }}>
                       <img src={f.icon} alt="" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
                     </div>

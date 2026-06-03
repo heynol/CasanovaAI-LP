@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Lottie from 'lottie-react';
+import { trackEvent } from '../mixpanel';
 import { 
   Sparkles, 
   Send, 
@@ -51,6 +52,24 @@ interface Message {
 export default function RizzOnboarding() {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    trackEvent('Onboarding Start');
+  }, []);
+
+  // Track Fail Screen Shown
+  useEffect(() => {
+    if (flowState === 'chat-jade' && apiInteractionCount >= 3 && !isAwaitingAPI) {
+      if (!hasTrackedFailRef.current) {
+        trackEvent('Onboarding Fail Screen Shown', {
+          score: currentScore
+        });
+        hasTrackedFailRef.current = true;
+      }
+    } else if (flowState !== 'chat-jade' || apiInteractionCount < 3) {
+      hasTrackedFailRef.current = false;
+    }
+  }, [flowState, apiInteractionCount, isAwaitingAPI, currentScore]);
+
   const getScoreColorClass = (score: number) => {
     if (score === 5.0) return 'score-grey';
     if (score < 5.0) return 'score-red';
@@ -99,6 +118,9 @@ export default function RizzOnboarding() {
   const [isCustomKeyboardState, setIsCustomKeyboardState] = useState<'initial' | 'generating' | 'carousel'>('initial');
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
   const [chloeScore, setChloeScore] = useState<number>(5.0);
+
+  const hasTrackedFailRef = useRef(false);
+  const hasTrackedSuccessRef = useRef(false);
 
   // Message dissolve IDs during rewind
   const [dissolvingIds, setDissolvingIds] = useState<Set<string>>(new Set());
@@ -368,6 +390,7 @@ export default function RizzOnboarding() {
           },
         ]);
         scrollToBottom();
+        trackEvent('Onboarding Chat Start');
       }, 1800);
 
       // 3. Bring up the keyboard and transition to chat-jade 1200ms after the message appears (total 3000ms)
@@ -445,11 +468,13 @@ export default function RizzOnboarding() {
       // 4. Swipe Right (green stamp & flies off-screen) at 4100ms
       const swipeTimer = setTimeout(() => {
         setSwipeClass('swipe-right');
+        trackEvent('Onboarding Swipe Completed');
       }, 4100);
 
       // 5. Transition to Match screen at 5100ms
       const transitionTimer = setTimeout(() => {
         setFlowState('intro-match');
+        trackEvent('Onboarding Match Shown');
       }, 5100);
 
       return () => {
@@ -571,6 +596,10 @@ export default function RizzOnboarding() {
     setJadeMessages(updatedHistory);
     setIsAwaitingAPI(true);
     scrollToBottom();
+    trackEvent('Onboarding Message Sent', {
+      step: apiInteractionCount + 1,
+      text: text
+    });
 
     // Setup complete chat history in the format required by backend:
     // [{"type": "Sent", "text": "..."}, {"type": "Received", "text": "..."}]
@@ -642,6 +671,12 @@ export default function RizzOnboarding() {
           setCurrentScore(nextScore);
           setApiInteractionCount(nextInteraction);
           setIsAwaitingAPI(false);
+          trackEvent('Onboarding Response Received', {
+            step: nextInteraction,
+            score: nextScore,
+            global_score: nextScore,
+            local_score: nextScore
+          });
 
           if (!isFinal) {
             // Swiftly bring back keyboard and input
@@ -686,6 +721,12 @@ export default function RizzOnboarding() {
       setCurrentScore(nextScore);
       setApiInteractionCount(nextInteraction);
       setIsAwaitingAPI(false);
+      trackEvent('Onboarding Response Received', {
+        step: nextInteraction,
+        score: nextScore,
+        global_score: nextScore,
+        local_score: nextScore
+      });
 
       if (nextInteraction < 3) {
         setTimeout(() => {
@@ -700,6 +741,7 @@ export default function RizzOnboarding() {
   // --- Glitch VHS Rewind Animation ---
   const handleVcrRewind = () => {
     setFlowState('rewinding');
+    trackEvent('Onboarding Rewind Clicked');
 
     const REWIND_DURATION = 3500; // ms — slow, cinematic rewind
 
@@ -761,6 +803,7 @@ export default function RizzOnboarding() {
       setChloeScore(5.0);
       setIsCustomKeyboardState('initial');
       setFlowState('chat-chloe');
+      trackEvent('Onboarding AI Chat Started');
 
       // Scroll to bottom for Chloe's first message
       setTimeout(() => {
@@ -777,6 +820,7 @@ export default function RizzOnboarding() {
   // --- Chloe Pre-written Interaction ---
   const handleGenerateCustomReplies = () => {
     setIsCustomKeyboardState('generating');
+    trackEvent('Onboarding AI Generate Clicked');
     
     setTimeout(() => {
       setIsCustomKeyboardState('carousel');
@@ -789,6 +833,16 @@ export default function RizzOnboarding() {
     const selectedText = option.text;
     const nextNodeId = option.next_node;
     const newScore = option.score;
+
+    const currentStep = chloeMessages.filter((m) => m.type === 'Sent').length + 1;
+
+    trackEvent('Onboarding AI Option Selected', {
+      step: currentStep,
+      node_id: currentNodeId,
+      selected_option_text: selectedText,
+      next_node_id: nextNodeId,
+      score: newScore
+    });
 
     // Add user selection to chat stream
     const userMsg: Message = {
@@ -820,9 +874,17 @@ export default function RizzOnboarding() {
       setCurrentNodeId(nextNodeId);
       scrollToBottom();
 
+      trackEvent('Onboarding AI Response Received', {
+        step: currentStep,
+        score: newScore
+      });
+
       if (nextNode.is_end_state) {
         // Transition to golden success card
         setFlowState('success');
+        trackEvent('Onboarding Success Shown', {
+          final_score: newScore
+        });
       }
     }, Math.max(nextNode.chloe_delay_ms || 1500, 3200));
   };
@@ -837,6 +899,7 @@ export default function RizzOnboarding() {
   };
 
   const handleSuccessCtaClick = () => {
+    trackEvent('Onboarding Success CTA Clicked');
     const destination = "https://onboarding.getcasanova.ai/pz4-mr0l-g44";
     try {
       const currentParams = new URLSearchParams(window.location.search);
@@ -2683,7 +2746,11 @@ export default function RizzOnboarding() {
                           {m.score !== undefined && (
                             <div className="msg-score-container">
                               <span className="rizz-label">Rizz:</span>
-                              <span className={`score-badge ${getScoreColorClass(m.score)}`}>
+                              <span 
+                                className={`score-badge ${getScoreColorClass(m.score)}`}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => trackEvent('Onboarding Score Clicked', { score: m.score, person: 'Jade' })}
+                              >
                                 {m.score >= 8.0 && '🔥 '}{m.score.toFixed(1)}/10
                               </span>
                             </div>
@@ -2709,7 +2776,11 @@ export default function RizzOnboarding() {
                           {m.score !== undefined && (
                             <div className="msg-score-container">
                               <span className="rizz-label">Rizz:</span>
-                              <span className={`score-badge ${getScoreColorClass(m.score)}`}>
+                              <span 
+                                className={`score-badge ${getScoreColorClass(m.score)}`}
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => trackEvent('Onboarding Score Clicked', { score: m.score, person: 'Chloe' })}
+                              >
                                 {m.score >= 8.0 && '🔥 '}{m.score.toFixed(1)}/10
                               </span>
                             </div>
@@ -2746,7 +2817,13 @@ export default function RizzOnboarding() {
               {/* Red Fail Card (Round 1 End) */}
               {flowState === 'chat-jade' && apiInteractionCount >= 3 && !isAwaitingAPI && (
                 <div className="fail-card">
-                  <div className="fail-score-badge">{currentScore.toFixed(1)} / 10</div>
+                  <div 
+                    className="fail-score-badge"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => trackEvent('Onboarding Score Clicked', { score: currentScore, type: 'fail_card' })}
+                  >
+                    {currentScore.toFixed(1)} / 10
+                  </div>
                   <h4 className="fail-title">Vibe Killed!</h4>
                   <p className="fail-desc">
                     Your manual replies didn't hit the mark. Jade got bored and matches are slipping away...
@@ -2760,7 +2837,11 @@ export default function RizzOnboarding() {
               {/* Golden Success Card (Round 2 End) */}
               {flowState === 'success' && (
                 <div className="success-gold-box">
-                  <div className="success-score-badge">
+                  <div 
+                    className="success-score-badge"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => trackEvent('Onboarding Score Clicked', { score: chloeScore, type: 'success_card' })}
+                  >
                     {chloeScore >= 8.0 && '🔥 '}{chloeScore.toFixed(1)} / 10
                   </div>
                   <h4 className="success-title">Vibe Secured!</h4>
