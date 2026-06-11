@@ -396,3 +396,7 @@ xandr.com, 13799, RESELLER
 xandr.com, 14082, RESELLER
 yieldmo.com, 3591550211052216798, RESELLER, 6a92c77cfc3d2258
 zmaticoo.com, 5135655, RESELLER
+facebook.com, 988464909180318, RESELLER, c3e20eee3f780d68
+mintegral.com, 69251, DIRECT, 0aeed750c80d6423
+pubmatic.com, 161490, RESELLER, 5d62403b186f2ace
+pangleglobal.com, 5038631, DIRECT
