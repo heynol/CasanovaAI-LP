@@ -112,6 +112,116 @@ export default function RizzOnboarding() {
   // Message dissolve IDs during rewind
   const [dissolvingIds, setDissolvingIds] = useState<Set<string>>(new Set());
 
+  // Autoplay Showcase mode states and refs
+  const [isAutoplay, setIsAutoplay] = useState<boolean>(false);
+  const autoplayTimersRef = useRef<any[]>([]);
+  const typingIntervalRef = useRef<any>(null);
+
+  const clearAutoplayTimers = () => {
+    autoplayTimersRef.current.forEach((t) => clearTimeout(t));
+    autoplayTimersRef.current = [];
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+      typingIntervalRef.current = null;
+    }
+  };
+
+  // Cleanup autoplay timers on unmount
+  useEffect(() => {
+    return () => clearAutoplayTimers();
+  }, []);
+
+  // Autoplay Showcase Mode state machine engine
+  useEffect(() => {
+    if (!isAutoplay) {
+      clearAutoplayTimers();
+      return;
+    }
+
+    // --- STAGE 1: JADE MANUAL CHAT ---
+    if (flowState === 'chat-jade') {
+      if (apiInteractionCount === 0 && !isAwaitingAPI && jadeMessages.length === 1 && inputText === '') {
+        const timer = setTimeout(() => {
+          simulateTypeMessage("I guess you'll have to find out. I promise my marketing is 100% accurate.", () => {
+            const timerSend = setTimeout(() => {
+              handleSendJadeMessage();
+            }, 600);
+            autoplayTimersRef.current.push(timerSend);
+          });
+        }, 1200);
+        autoplayTimersRef.current.push(timer);
+      }
+      
+      else if (apiInteractionCount === 1 && !isAwaitingAPI && inputText === '') {
+        const timer = setTimeout(() => {
+          simulateTypeMessage("I can do tequila stunts and list my Spotify wrapped by heart.", () => {
+            const timerSend = setTimeout(() => {
+              handleSendJadeMessage();
+            }, 600);
+            autoplayTimersRef.current.push(timerSend);
+          });
+        }, 1500);
+        autoplayTimersRef.current.push(timer);
+      }
+
+      else if (apiInteractionCount === 2 && !isAwaitingAPI && inputText === '') {
+        const timer = setTimeout(() => {
+          simulateTypeMessage("Wait, give me one more chance, I can do better than that.", () => {
+            const timerSend = setTimeout(() => {
+              handleSendJadeMessage();
+            }, 600);
+            autoplayTimersRef.current.push(timerSend);
+          });
+        }, 1500);
+        autoplayTimersRef.current.push(timer);
+      }
+
+      else if (apiInteractionCount === 3 && !isAwaitingAPI) {
+        const timer = setTimeout(() => {
+          handleVcrRewind();
+        }, 2500);
+        autoplayTimersRef.current.push(timer);
+      }
+    }
+
+    // --- STAGE 2: CHLOE AI CHAT ---
+    if (flowState === 'chat-chloe' && !isAwaitingAPI) {
+      const currentNode = secondRoundData.nodes[currentNodeId];
+      if (currentNode && !currentNode.is_end_state) {
+        if (isCustomKeyboardState === 'initial') {
+          const timer = setTimeout(() => {
+            handleGenerateCustomReplies();
+          }, 1200);
+          autoplayTimersRef.current.push(timer);
+        } else if (isCustomKeyboardState === 'carousel') {
+          const timer = setTimeout(() => {
+            const options = currentNode.user_options || [];
+            if (options.length > 0) {
+              let bestOption = options[0];
+              options.forEach((opt) => {
+                if (opt.score > bestOption.score) {
+                  bestOption = opt;
+                }
+              });
+              const bestIndex = options.indexOf(bestOption);
+              setCarouselIndex(bestIndex);
+
+              const timerSend = setTimeout(() => {
+                handleSendCarouselReply(bestOption);
+              }, 800);
+              autoplayTimersRef.current.push(timerSend);
+            }
+          }, 1800);
+          autoplayTimersRef.current.push(timer);
+        }
+      }
+    }
+
+    if (flowState === 'success') {
+      setIsAutoplay(false);
+    }
+  }, [isAutoplay, flowState, isAwaitingAPI, apiInteractionCount, isCustomKeyboardState, currentNodeId, jadeMessages.length]);
+
   const isKeyboardVisible = flowState === 'chat-chloe' && !isAwaitingAPI;
 
   // References
@@ -156,7 +266,9 @@ export default function RizzOnboarding() {
     } else if (flowState === 'intro-swipe') {
       setFlowState('intro-match');
     } else if (flowState === 'intro-match') {
-      handleTransitionToChatInit();
+      if (matchStep < 4) {
+        setMatchStep(4);
+      }
     }
   };
 
@@ -515,17 +627,11 @@ export default function RizzOnboarding() {
         setMatchStep(4);
       }, 3800);
 
-      // Step 5: Automatically transition to chat-init at 6500ms
-      const timer5 = setTimeout(() => {
-        handleTransitionToChatInit();
-      }, 6500);
-
       return () => {
         clearTimeout(timer1);
         clearTimeout(timer2);
         clearTimeout(timer3);
         clearTimeout(timer4);
-        clearTimeout(timer5);
       };
     } else {
       setMatchStep(0);
@@ -559,6 +665,35 @@ export default function RizzOnboarding() {
     setIsAwaitingAPI(true);
     setFlowState('chat-init');
     scrollToBottom();
+  };
+
+  const handleStartChat = (autoplay: boolean) => {
+    setIsAutoplay(autoplay);
+    handleTransitionToChatInit();
+    if (autoplay) {
+      trackEvent('Onboarding Start Autoplay');
+    } else {
+      trackEvent('Onboarding Start Interactive');
+    }
+  };
+
+  const simulateTypeMessage = (text: string, onComplete: () => void) => {
+    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+    
+    let index = 0;
+    typingIntervalRef.current = setInterval(() => {
+      const typed = text.substring(0, index + 1);
+      setInputText(typed);
+      if (inputRef.current) {
+        inputRef.current.textContent = typed;
+      }
+      index++;
+      if (index >= text.length) {
+        clearInterval(typingIntervalRef.current);
+        typingIntervalRef.current = null;
+        onComplete();
+      }
+    }, 35);
   };
 
   // --- iOS Keyboard Key Taps ---
@@ -2576,6 +2711,139 @@ export default function RizzOnboarding() {
           opacity: 1;
           transform: translate3d(0, 0, 0);
         }
+        .disabled-interaction {
+          pointer-events: none !important;
+        }
+        
+        .disabled-interaction input,
+        .disabled-interaction textarea,
+        .disabled-interaction .real-input,
+        .disabled-interaction button,
+        .disabled-interaction .custom-kbd-btn,
+        .disabled-interaction .send-btn-bubble {
+          pointer-events: none !important;
+        }
+
+        .autoplay-badge-overlay {
+          position: absolute;
+          top: 1rem;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(20, 20, 25, 0.85);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(66, 239, 188, 0.3);
+          border-radius: 100px;
+          padding: 6px 16px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          z-index: 500;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(66, 239, 188, 0.2);
+          animation: slideDownBadge 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          pointer-events: auto; /* allow clicking the exit button inside it */
+        }
+
+        @keyframes slideDownBadge {
+          from { opacity: 0; transform: translate(-50%, -20px); }
+          to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        .autoplay-pulse-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #42efbc;
+          box-shadow: 0 0 8px #42efbc;
+          animation: pulseDot 1.5s infinite alternate;
+        }
+
+        @keyframes pulseDot {
+          from { transform: scale(1); opacity: 0.7; }
+          to { transform: scale(1.3); opacity: 1; }
+        }
+
+        .autoplay-text {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #ffffff;
+          letter-spacing: 0.02em;
+        }
+
+        .autoplay-exit-btn {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: #ffffff;
+          padding: 4px 10px;
+          border-radius: 100px;
+          font-size: 0.75rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          margin-left: 4px;
+        }
+
+        .autoplay-exit-btn:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: scale(1.05);
+        }
+
+        .match-choice-buttons {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          width: 100%;
+          max-width: 300px;
+          margin-top: 1.5rem;
+          opacity: 0;
+          animation: slideUpChoices 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation-delay: 0.2s;
+        }
+
+        @keyframes slideUpChoices {
+          from { opacity: 0; transform: translateY(15px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .match-choice-btn {
+          width: 100%;
+          padding: 14px 20px;
+          border-radius: 100px;
+          font-size: 1.05rem;
+          font-weight: 800;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: inherit;
+        }
+
+        .manual-btn {
+          background: #ffffff;
+          color: #000000;
+          border: none;
+          box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .manual-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .autoplay-btn {
+          background: linear-gradient(135deg, rgba(37, 99, 235, 0.2), rgba(66, 239, 188, 0.2));
+          color: #42efbc;
+          border: 1px solid rgba(66, 239, 188, 0.4);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+        }
+
+        .autoplay-btn:hover {
+          background: linear-gradient(135deg, rgba(37, 99, 235, 0.3), rgba(66, 239, 188, 0.3));
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(66, 239, 188, 0.2);
+        }
       `}</style>
 
       {/* Ambient background decoration */}
@@ -2595,6 +2863,16 @@ export default function RizzOnboarding() {
           onMouseDown={handleIntroMouseDown}
           onMouseUp={handleIntroMouseUp}
         >
+          {/* --- Autoplay Showcase Mode Overlay --- */}
+          {isAutoplay && (
+            <div className="autoplay-badge-overlay">
+              <span className="autoplay-pulse-dot"></span>
+              <span className="autoplay-text">Showcase Mode</span>
+              <button className="autoplay-exit-btn" onClick={() => setIsAutoplay(false)}>
+                Take Control
+              </button>
+            </div>
+          )}
           
           {/* --- VCR Rewind Overlay --- */}
           {flowState === 'rewinding' && (
@@ -2667,6 +2945,8 @@ export default function RizzOnboarding() {
             ['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState) ? 'is-intro' : ''
           } ${
             flowState === 'chat-chloe' ? 'chloe-active' : ''
+          } ${
+            isAutoplay ? 'disabled-interaction' : ''
           }`}>
               {/* Message Stream — no onScroll needed since sticky header is removed */}
               <div 
@@ -2728,6 +3008,19 @@ export default function RizzOnboarding() {
                     <div className={`match-prompt-capsule ${matchStep >= 4 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
                       Show her what you got to seal the deal and get a date.
                     </div>
+
+                    {/* Step 5: Options for Manual vs Autoplay Showcase */}
+                    {flowState === 'intro-match' && matchStep >= 4 && (
+                      <div className="match-choice-buttons">
+                        <button className="match-choice-btn manual-btn" onClick={() => handleStartChat(false)}>
+                          Try it myself
+                        </button>
+                        <button className="match-choice-btn autoplay-btn" onClick={() => handleStartChat(true)}>
+                          <Sparkles size={14} style={{ marginRight: '6px' }} />
+                          See how it works
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
