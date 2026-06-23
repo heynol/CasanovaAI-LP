@@ -12,6 +12,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import RizzOnboarding from './pages/RizzOnboarding';
+import FeatureReel from './pages/FeatureReel';
 import { trackEvent } from './mixpanel';
 
 function ScrollToTop() {
@@ -336,7 +337,10 @@ function LandingPage() {
 
 function App() {
   const location = useLocation();
-  const isOnboarding = location.pathname.toLowerCase() === '/rizzonboarding';
+  const path = location.pathname.toLowerCase();
+  const isOnboarding = path === '/rizzonboarding';
+  const isReel = path === '/featurereel';
+  const isBare = isOnboarding || isReel;
 
   return (
     <div className="app-container" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -347,9 +351,10 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/RizzOnboarding" element={<RizzOnboarding />} />
+          <Route path="/featurereel" element={<FeatureReel />} />
         </Routes>
       </main>
-      {!isOnboarding && <Footer />}
+      {!isBare && <Footer />}
     </div>
   );
 }
