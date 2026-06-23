@@ -486,7 +486,7 @@ export default function RizzOnboarding() {
     if (flowState === 'intro-logo') {
       introTimerRef.current = setTimeout(() => setFlowState('intro-rizz'), 3800);
     } else if (flowState === 'intro-rizz') {
-      introTimerRef.current = setTimeout(() => setFlowState('intro-swipe'), 4000);
+      introTimerRef.current = setTimeout(() => setFlowState('intro-match'), 4000);
     } else if (flowState === 'chat-init') {
       // 1. Initially show typing indicator (set Jade messages empty and typing to true)
       setIsAwaitingAPI(true);
@@ -677,10 +677,29 @@ export default function RizzOnboarding() {
 
   const handleStartChat = (autoplay: boolean) => {
     setIsAutoplay(autoplay);
-    handleTransitionToChatInit();
     if (autoplay) {
+      setJadeMessages([]);
+      setChloeMessages([
+        {
+          id: 'chloe-init',
+          type: 'Received',
+          text: secondRoundData.nodes['1_Initial'].chloe_message,
+        },
+      ]);
+      setCurrentNodeId('1_Initial');
+      setChloeScore(5.0);
+      setIsCustomKeyboardState('initial');
+      setFlowState('chat-chloe');
+      
+      setTimeout(() => {
+        setIsKeyboardExpanded(true);
+        inputRef.current?.focus();
+        scrollToBottom();
+      }, 500);
+
       trackEvent('Onboarding Start Autoplay');
     } else {
+      handleTransitionToChatInit();
       trackEvent('Onboarding Start Interactive');
     }
   };
@@ -3036,11 +3055,11 @@ export default function RizzOnboarding() {
                     {flowState === 'intro-match' && matchStep >= 4 && (
                       <div className="match-choice-buttons">
                         <button className="match-choice-btn manual-btn" onClick={() => handleStartChat(false)}>
-                          Try it myself
+                          Flirt for myself
                         </button>
                         <button className="match-choice-btn autoplay-btn" onClick={() => handleStartChat(true)}>
                           <Sparkles size={14} style={{ marginRight: '6px' }} />
-                          See how it works
+                          Watch AI flirt
                         </button>
                       </div>
                     )}
