@@ -142,44 +142,44 @@ export default function RizzOnboarding() {
     if (flowState === 'chat-jade') {
       if (apiInteractionCount === 0 && !isAwaitingAPI && jadeMessages.length === 1 && inputText === '') {
         const timer = setTimeout(() => {
-          simulateTypeMessage("I guess you'll have to find out. I promise my marketing is 100% accurate.", () => {
+          simulateTypeMessage("Haha I'm hilarious. Trust me, I'm the funny guy in my friend group.", () => {
             const timerSend = setTimeout(() => {
               handleSendJadeMessage();
-            }, 600);
+            }, 1500);
             autoplayTimersRef.current.push(timerSend);
           });
-        }, 1200);
+        }, 2500);
         autoplayTimersRef.current.push(timer);
       }
       
       else if (apiInteractionCount === 1 && !isAwaitingAPI && inputText === '') {
         const timer = setTimeout(() => {
-          simulateTypeMessage("I can do tequila stunts and list my Spotify wrapped by heart.", () => {
+          simulateTypeMessage("Alright fine, here's a joke: why did the chicken cross the road?", () => {
             const timerSend = setTimeout(() => {
               handleSendJadeMessage();
-            }, 600);
+            }, 1500);
             autoplayTimersRef.current.push(timerSend);
           });
-        }, 1500);
+        }, 3000);
         autoplayTimersRef.current.push(timer);
       }
 
       else if (apiInteractionCount === 2 && !isAwaitingAPI && inputText === '') {
         const timer = setTimeout(() => {
-          simulateTypeMessage("Wait, give me one more chance, I can do better than that.", () => {
+          simulateTypeMessage("Okay damn, you're tough. Let me try a different approach...", () => {
             const timerSend = setTimeout(() => {
               handleSendJadeMessage();
-            }, 600);
+            }, 1500);
             autoplayTimersRef.current.push(timerSend);
           });
-        }, 1500);
+        }, 3000);
         autoplayTimersRef.current.push(timer);
       }
 
       else if (apiInteractionCount === 3 && !isAwaitingAPI) {
         const timer = setTimeout(() => {
           handleVcrRewind();
-        }, 2500);
+        }, 4000);
         autoplayTimersRef.current.push(timer);
       }
     }
@@ -191,7 +191,7 @@ export default function RizzOnboarding() {
         if (isCustomKeyboardState === 'initial') {
           const timer = setTimeout(() => {
             handleGenerateCustomReplies();
-          }, 1200);
+          }, 2500);
           autoplayTimersRef.current.push(timer);
         } else if (isCustomKeyboardState === 'carousel') {
           const timer = setTimeout(() => {
@@ -208,10 +208,10 @@ export default function RizzOnboarding() {
 
               const timerSend = setTimeout(() => {
                 handleSendCarouselReply(bestOption);
-              }, 800);
+              }, 2000);
               autoplayTimersRef.current.push(timerSend);
             }
-          }, 1800);
+          }, 3500);
           autoplayTimersRef.current.push(timer);
         }
       }
@@ -625,6 +625,14 @@ export default function RizzOnboarding() {
       // Step 4: Instructions capsule (matchStep = 4) at 3800ms
       const timer4 = setTimeout(() => {
         setMatchStep(4);
+        setTimeout(() => {
+          if (chatStreamRef.current) {
+            chatStreamRef.current.scrollTo({
+              top: chatStreamRef.current.scrollHeight,
+              behavior: 'smooth'
+            });
+          }
+        }, 150);
       }, 3800);
 
       return () => {
@@ -693,7 +701,7 @@ export default function RizzOnboarding() {
         typingIntervalRef.current = null;
         onComplete();
       }
-    }, 35);
+    }, 60);
   };
 
   // --- iOS Keyboard Key Taps ---
@@ -836,13 +844,13 @@ export default function RizzOnboarding() {
       let nextScore = 5.0;
 
       if (nextInteraction === 1) {
-        replyText = "Mmh, that's exactly what a marketing guy would say. I need proof. What's your actual stunt? 🌶️";
+        replyText = "Ah yes, 'trust me bro'. The universal proof of comedy. Try again. 🥱";
         nextScore = 4.2;
       } else if (nextInteraction === 2) {
-        replyText = "Tequila stunts? Sounds like you're trying a bit too hard to be interesting. Next. 🙄";
+        replyText = "A chicken joke? Seriously? Are you 12? Next. 🙄";
         nextScore = 3.1;
       } else {
-        replyText = "Okay, we are definitely not on the same page. Let's just end this here before it gets even more awkward.";
+        replyText = "Yeah, I think we're done here. This is getting painful to watch. ✌️";
         nextScore = 3.4;
       }
 
@@ -871,7 +879,7 @@ export default function RizzOnboarding() {
         }, 800);
       }
       scrollToBottom();
-    }, 1500); // Simulated delay
+    }, isAutoplay ? 3000 : 1500); // Simulated delay
   };
 
   // --- Glitch VHS Rewind Animation ---
@@ -1048,6 +1056,8 @@ export default function RizzOnboarding() {
       window.location.href = destination;
     }
   };
+
+  const isIntroActive = ['intro-logo', 'intro-rizz', 'intro-swipe'].includes(flowState) || (flowState === 'intro-match' && matchStep < 4);
 
   return (
     <div className="rizz-page-wrapper">
@@ -2729,15 +2739,17 @@ export default function RizzOnboarding() {
           top: 1rem;
           left: 50%;
           transform: translateX(-50%);
+          width: calc(100% - 2rem);
+          max-width: 400px;
+          justify-content: space-between;
           background: rgba(20, 20, 25, 0.85);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
           border: 1px solid rgba(66, 239, 188, 0.3);
           border-radius: 100px;
-          padding: 6px 16px;
+          padding: 10px 18px; /* increased padding for height */
           display: flex;
           align-items: center;
-          gap: 10px;
           z-index: 500;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(66, 239, 188, 0.2);
           animation: slideDownBadge 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -2749,6 +2761,12 @@ export default function RizzOnboarding() {
           to { opacity: 1; transform: translate(-50%, 0); }
         }
 
+        .autoplay-badge-left {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
         .autoplay-pulse-dot {
           width: 8px;
           height: 8px;
@@ -2756,6 +2774,7 @@ export default function RizzOnboarding() {
           background: #42efbc;
           box-shadow: 0 0 8px #42efbc;
           animation: pulseDot 1.5s infinite alternate;
+          flex-shrink: 0;
         }
 
         @keyframes pulseDot {
@@ -2768,6 +2787,8 @@ export default function RizzOnboarding() {
           font-weight: 700;
           color: #ffffff;
           letter-spacing: 0.02em;
+          text-align: left;
+          line-height: 1.2;
         }
 
         .autoplay-exit-btn {
@@ -2857,7 +2878,7 @@ export default function RizzOnboarding() {
         <div className="phone-island"></div>
 
         <div 
-          className={`phone-screen ${['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState) ? 'is-intro' : ''}`}
+          className={`phone-screen ${isIntroActive ? 'is-intro' : ''}`}
           onTouchStart={handleIntroTouchStart}
           onTouchEnd={handleIntroTouchEnd}
           onMouseDown={handleIntroMouseDown}
@@ -2866,8 +2887,10 @@ export default function RizzOnboarding() {
           {/* --- Autoplay Showcase Mode Overlay --- */}
           {isAutoplay && (
             <div className="autoplay-badge-overlay">
-              <span className="autoplay-pulse-dot"></span>
-              <span className="autoplay-text">Showcase Mode</span>
+              <div className="autoplay-badge-left">
+                <span className="autoplay-pulse-dot"></span>
+                <span className="autoplay-text">Showcase Mode</span>
+              </div>
               <button className="autoplay-exit-btn" onClick={() => setIsAutoplay(false)}>
                 Take Control
               </button>
@@ -2942,7 +2965,7 @@ export default function RizzOnboarding() {
 
           {/* --- STEPS 1-3: Chat streams (Jade Live API / Fallback OR Chloe Pre-written) --- */}
           <div className={`chat-container ${
-            ['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState) ? 'is-intro' : ''
+            isIntroActive ? 'is-intro' : ''
           } ${
             flowState === 'chat-chloe' ? 'chloe-active' : ''
           } ${
@@ -2950,7 +2973,7 @@ export default function RizzOnboarding() {
           }`}>
               {/* Message Stream — no onScroll needed since sticky header is removed */}
               <div 
-                className={`chat-messages-stream ${flowState === 'rewinding' ? 'rewinding' : ''} ${['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState) ? 'is-intro' : ''}`} 
+                className={`chat-messages-stream ${flowState === 'rewinding' ? 'rewinding' : ''} ${isIntroActive ? 'is-intro' : ''}`} 
                 ref={chatStreamRef} 
               >
                 {/* Profile Header (visible at the top of the chat scroll stream) */}
