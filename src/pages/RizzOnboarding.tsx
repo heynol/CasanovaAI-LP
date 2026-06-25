@@ -63,10 +63,10 @@ export default function RizzOnboarding() {
     return 'score-green';
   };
 
-  // State Machine: 
-  // 'intro-logo' -> 'intro-rizz' -> 'intro-swipe' -> 'intro-match' -> 'chat-init' -> 'chat-jade' -> 'rewinding' -> 'chat-chloe' -> 'success'
+  // State Machine:
+  // 'intro-logo' -> 'intro-rizz' -> 'intro-match' -> 'chat-init' -> 'chat-jade' -> 'rewinding' -> 'chat-chloe' -> 'success'
   const [flowState, setFlowState] = useState<
-    'intro-logo' | 'intro-rizz' | 'intro-swipe' | 'intro-match' | 'chat-init' | 'chat-jade' | 'rewinding' | 'chat-chloe' | 'success'
+    'intro-logo' | 'intro-rizz' | 'intro-match' | 'chat-init' | 'chat-jade' | 'rewinding' | 'chat-chloe' | 'success'
   >('intro-logo');
 
   const flowStateRef = useRef(flowState);
@@ -77,7 +77,6 @@ export default function RizzOnboarding() {
   // Additional states for Tinder Swipe and Match sequences
   const [typedSubline, setTypedSubline] = useState('');
   const [isTypingSubline, setIsTypingSubline] = useState(false);
-  const [swipeClass, setSwipeClass] = useState<'hidden' | 'center' | 'tease-left' | 'tease-right' | 'swipe-left' | 'swipe-right'>('hidden');
   const [matchStep, setMatchStep] = useState<number>(0);
 
   // Lock down html/body to prevent any mobile scroll rubber-banding or bounce
@@ -262,8 +261,6 @@ export default function RizzOnboarding() {
     if (flowState === 'intro-logo') {
       setFlowState('intro-rizz');
     } else if (flowState === 'intro-rizz') {
-      setFlowState('intro-swipe');
-    } else if (flowState === 'intro-swipe') {
       setFlowState('intro-match');
     } else if (flowState === 'intro-match') {
       if (matchStep < 4) {
@@ -273,12 +270,12 @@ export default function RizzOnboarding() {
   };
 
   const handleIntroTouchStart = (e: React.TouchEvent) => {
-    if (!['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) return;
+    if (!['intro-logo', 'intro-rizz', 'intro-match'].includes(flowState)) return;
     introTouchStartY.current = e.touches[0].clientY;
   };
 
   const handleIntroTouchEnd = (e: React.TouchEvent) => {
-    if (!['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) return;
+    if (!['intro-logo', 'intro-rizz', 'intro-match'].includes(flowState)) return;
     if (introTouchStartY.current === null) return;
     // Prevent the browser from generating synthetic mouse/click events after touch
     e.preventDefault();
@@ -287,14 +284,14 @@ export default function RizzOnboarding() {
   };
 
   const handleIntroMouseDown = (e: React.MouseEvent) => {
-    if (!['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) return;
+    if (!['intro-logo', 'intro-rizz', 'intro-match'].includes(flowState)) return;
     introMouseStartY.current = e.clientY;
   };
 
   // Consolidate into mouseUp only (no separate onClick) to prevent double-firing.
   // Fires for both taps (diffY ≈ 0) and swipes (diffY > threshold).
   const handleIntroMouseUp = (e: React.MouseEvent) => {
-    if (!['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) return;
+    if (!['intro-logo', 'intro-rizz', 'intro-match'].includes(flowState)) return;
     if (introMouseStartY.current === null) return;
     introMouseStartY.current = null;
     handleNextState();
@@ -438,9 +435,9 @@ export default function RizzOnboarding() {
 
   // Auto-scroll chat to bottom
   const scrollToBottom = (instant = false) => {
-    if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowStateRef.current)) return;
+    if (['intro-logo', 'intro-rizz', 'intro-match', 'rewinding'].includes(flowStateRef.current)) return;
     setTimeout(() => {
-      if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowStateRef.current)) return;
+      if (['intro-logo', 'intro-rizz', 'intro-match', 'rewinding'].includes(flowStateRef.current)) return;
       if (chatStreamRef.current) {
         chatStreamRef.current.scrollTo({
           top: chatStreamRef.current.scrollHeight,
@@ -455,7 +452,7 @@ export default function RizzOnboarding() {
     const vv = window.visualViewport;
     if (!vv) return;
     const handleVVResize = () => {
-      if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowStateRef.current)) return;
+      if (['intro-logo', 'intro-rizz', 'intro-match', 'rewinding'].includes(flowStateRef.current)) return;
       // Small delay to let the layout reflow settle after keyboard animation
       setTimeout(() => {
         if (chatStreamRef.current) {
@@ -472,7 +469,7 @@ export default function RizzOnboarding() {
 
   // Lock scroll to top during all intro states to prevent visual jumps
   useEffect(() => {
-    if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match'].includes(flowState)) {
+    if (['intro-logo', 'intro-rizz', 'intro-match'].includes(flowState)) {
       if (chatStreamRef.current) {
         chatStreamRef.current.scrollTop = 0;
       }
@@ -558,54 +555,11 @@ export default function RizzOnboarding() {
     }
   }, [flowState]);
 
-  // Tinder Swipe Animation Automated Sequence
-  useEffect(() => {
-    if (flowState === 'intro-swipe') {
-      setSwipeClass('center');
-      
-      // 1. Tease Left (red stamp) at 900ms
-      const teaseTimer = setTimeout(() => {
-        setSwipeClass('tease-left');
-      }, 900);
-
-      // 2. Recover to center at 2100ms
-      const recoverTimer = setTimeout(() => {
-        setSwipeClass('center');
-      }, 2100);
-
-      // 3. Tease Right (green stamp & pause) at 2900ms
-      const teaseRightTimer = setTimeout(() => {
-        setSwipeClass('tease-right');
-      }, 2900);
-
-      // 4. Swipe Right (green stamp & flies off-screen) at 4100ms
-      const swipeTimer = setTimeout(() => {
-        setSwipeClass('swipe-right');
-        trackEvent('Onboarding Swipe Completed');
-      }, 4100);
-
-      // 5. Transition to Match screen at 5100ms
-      const transitionTimer = setTimeout(() => {
-        setFlowState('intro-match');
-        trackEvent('Onboarding Match Shown');
-      }, 5100);
-
-      return () => {
-        clearTimeout(teaseTimer);
-        clearTimeout(recoverTimer);
-        clearTimeout(teaseRightTimer);
-        clearTimeout(swipeTimer);
-        clearTimeout(transitionTimer);
-      };
-    } else {
-      setSwipeClass('hidden');
-    }
-  }, [flowState]);
-
   // Tinder Match Screen delayed one-by-one entries
   useEffect(() => {
     if (flowState === 'intro-match') {
       setMatchStep(0);
+      trackEvent('Onboarding Match Shown');
       
       // Step 1: Slide up profile photo (matchStep = 1) at 100ms
       const timer1 = setTimeout(() => {
@@ -659,10 +613,10 @@ export default function RizzOnboarding() {
 
   // Keep scroll at bottom when keyboard shows/hides
   useEffect(() => {
-    if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowState)) return;
+    if (['intro-logo', 'intro-rizz', 'intro-match', 'rewinding'].includes(flowState)) return;
     scrollToBottom();
     const timer = setTimeout(() => {
-      if (['intro-logo', 'intro-rizz', 'intro-swipe', 'intro-match', 'rewinding'].includes(flowState)) return;
+      if (['intro-logo', 'intro-rizz', 'intro-match', 'rewinding'].includes(flowState)) return;
       scrollToBottom();
     }, 400);
     return () => clearTimeout(timer);
@@ -1076,7 +1030,7 @@ export default function RizzOnboarding() {
     }
   };
 
-  const isIntroActive = ['intro-logo', 'intro-rizz', 'intro-swipe'].includes(flowState) || (flowState === 'intro-match' && matchStep < 4);
+  const isIntroActive = ['intro-logo', 'intro-rizz'].includes(flowState) || (flowState === 'intro-match' && matchStep < 4);
 
   return (
     <div className="rizz-page-wrapper">
@@ -2373,182 +2327,6 @@ export default function RizzOnboarding() {
           50% { opacity: 0; }
         }
 
-        /* Tinder Profile Card Simulator */
-        .tinder-card-container {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -48%);
-          width: 88%;
-          height: 490px;
-          perspective: 1000px;
-          z-index: 30;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          pointer-events: none;
-          animation: scaleInCard 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        @keyframes scaleInCard {
-          from { opacity: 0; transform: translate(-50%, -48%) scale(0.8); }
-          to { opacity: 1; transform: translate(-50%, -48%) scale(1); }
-        }
-
-        .tinder-card {
-          width: 100%;
-          height: 100%;
-          background: #111113;
-          border-radius: 28px;
-          overflow: hidden;
-          box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          position: relative;
-          transform-origin: bottom center;
-          transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.1), opacity 0.7s ease;
-          will-change: transform, opacity;
-        }
-
-        .tinder-card-img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .tinder-card-overlay {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 55%;
-          background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0) 100%);
-          pointer-events: none;
-        }
-
-        .tinder-card-info {
-          position: absolute;
-          bottom: 24px;
-          left: 20px;
-          right: 20px;
-          z-index: 2;
-          text-align: left;
-        }
-
-        .tinder-card-name {
-          font-size: 1.45rem;
-          font-weight: 800;
-          color: #ffffff;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-          letter-spacing: -0.01em;
-        }
-
-        .tinder-card-age {
-          font-weight: 400;
-          opacity: 0.9;
-        }
-
-        .tinder-card-bio-teaser {
-          font-size: 0.82rem;
-          color: rgba(255, 255, 255, 0.75);
-          margin: 6px 0 0 0;
-          line-height: 1.35;
-        }
-
-        .tinder-card-metrics {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 0.75rem;
-          color: #42efbc;
-          margin-top: 10px;
-          font-weight: 600;
-        }
-
-        .tinder-metric-dot {
-          width: 6px;
-          height: 6px;
-          background-color: #42efbc;
-          border-radius: 50%;
-          box-shadow: 0 0 8px #42efbc;
-          animation: pulseMetric 1.5s infinite alternate;
-        }
-
-        @keyframes pulseMetric {
-          0% { opacity: 0.6; }
-          100% { opacity: 1; }
-        }
-
-        .tinder-stamp {
-          position: absolute;
-          top: 35px;
-          border: 4px solid;
-          border-radius: 8px;
-          padding: 4px 14px;
-          font-size: 1.8rem;
-          font-weight: 900;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          opacity: 0;
-          transform: scale(1.3);
-          transition: opacity 0.25s ease, transform 0.25s ease;
-          z-index: 5;
-          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        .tinder-stamp.nope {
-          right: 25px;
-          color: #ff0844;
-          border-color: #ff0844;
-          transform: rotate(15deg) scale(1.1);
-          box-shadow: 0 0 15px rgba(255, 8, 68, 0.2);
-        }
-
-        .tinder-stamp.like {
-          left: 25px;
-          color: #42efbc;
-          border-color: #42efbc;
-          transform: rotate(-15deg) scale(1.1);
-          box-shadow: 0 0 15px rgba(66, 239, 188, 0.25);
-        }
-
-        /* Tinder Animation States */
-        .tinder-card.tease-left {
-          transform: translate3d(-30px, 4px, 0) rotate(-5deg);
-        }
-        .tinder-card.tease-left .tinder-stamp.nope {
-          opacity: 1;
-          transform: rotate(15deg) scale(1);
-        }
-
-        .tinder-card.tease-right {
-          transform: translate3d(30px, 4px, 0) rotate(5deg);
-        }
-        .tinder-card.tease-right .tinder-stamp.like {
-          opacity: 1;
-          transform: rotate(-15deg) scale(1);
-        }
-
-        .tinder-card.swipe-right {
-          transform: translate3d(450px, -20px, 0) rotate(20deg) scale(0.9);
-          opacity: 0;
-          transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s ease;
-        }
-        .tinder-card.swipe-right .tinder-stamp.like {
-          opacity: 1;
-          transform: rotate(-15deg) scale(1);
-        }
-
-        .tinder-card.swipe-left {
-          transform: translate3d(-450px, -20px, 0) rotate(-20deg) scale(0.9);
-          opacity: 0;
-          transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.6s ease;
-        }
-        .tinder-card.swipe-left .tinder-stamp.nope {
-          opacity: 1;
-          transform: rotate(15deg) scale(1);
-        }
-
         /* Tinder Match Screen */
         .tinder-match-screen {
           position: absolute;
@@ -2954,34 +2732,6 @@ export default function RizzOnboarding() {
           {/* Radial match stars glow visible during match step */}
           {flowState === 'intro-match' && <div className="match-stars-glow"></div>}
 
-          {/* --- Tinder Swipe Card Overlay --- */}
-          {flowState === 'intro-swipe' && (
-            <div className="tinder-card-container">
-              <div className={`tinder-card ${swipeClass}`}>
-                <img src="/RizzOnboarding/Assets/AvatarJade.png" alt="Jade" className="tinder-card-img" />
-                <div className="tinder-card-overlay"></div>
-                
-                {/* Tinder Stamps */}
-                <div className="tinder-stamp nope">NOPE</div>
-                <div className="tinder-stamp like">LIKE</div>
-                
-                {/* Tinder Info overlay */}
-                <div className="tinder-card-info">
-                  <h3 className="tinder-card-name">
-                    Jade, <span className="tinder-card-age">21</span>
-                  </h3>
-                  <p className="tinder-card-bio-teaser">
-                    "Fluent in sarcasm. Spotify wrapped judge..."
-                  </p>
-                  <div className="tinder-card-metrics">
-                    <span className="tinder-metric-dot"></span>
-                    Active Today
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* --- STEPS 1-3: Chat streams (Jade Live API / Fallback OR Chloe Pre-written) --- */}
           <div className={`chat-container ${
             isIntroActive ? 'is-intro' : ''
@@ -3001,7 +2751,7 @@ export default function RizzOnboarding() {
                   className={`chat-profile-header ${
                   flowState === 'intro-logo' ? 'at-logo' :
                   flowState === 'intro-rizz' ? 'at-rizz' :
-                  ['intro-swipe', 'intro-match'].includes(flowState) ? 'at-persona' : 'at-chat'
+                  flowState === 'intro-match' ? 'at-persona' : 'at-chat'
                 }`}>
                   
                   {/* Screen 2: Test your Rizz group */}
@@ -3017,7 +2767,7 @@ export default function RizzOnboarding() {
                   </div>
                   
                   {/* Tinder-style Match Header & Card merged directly inside the chat flow */}
-                  <div className={`tinder-match-card-wrapper ${['intro-logo', 'intro-rizz', 'intro-swipe'].includes(flowState) ? 'pushed-down' : 'in-view'}`}>
+                  <div className={`tinder-match-card-wrapper ${['intro-logo', 'intro-rizz'].includes(flowState) ? 'pushed-down' : 'in-view'}`}>
                     
                     {/* Glowing Match Title */}
                     <div className={`match-title-overlay ${matchStep >= 1 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
