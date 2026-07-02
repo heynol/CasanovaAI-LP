@@ -8,6 +8,7 @@ export const initMixpanel = () => {
       debug: import.meta.env.DEV,
       track_pageview: true,
       persistence: 'localstorage',
+      api_host: 'https://api-eu.mixpanel.com',
     });
   } else {
     console.warn('Mixpanel Token (VITE_MIXPANEL_TOKEN) is missing. Tracking events will be logged to the console instead.');

@@ -22,6 +22,11 @@ type Feature = {
   zoomOut?: number;
   exitAt: number;
   nextAt: number;
+  // Optional "analysis" scan: pause the video once the device is centred, sweep a
+  // laser scanline down and back up over the frozen frame, then resume playback.
+  scan?: boolean;
+  scanAt?: number;       // when to pause the video & start the sweep (device centred)
+  scanDuration?: number; // total sweep time (down + back up)
 };
 
 const COPY_IN = 1200; // same for all features
@@ -48,10 +53,17 @@ const FEATURES: Feature[] = [
     line1: 'ALWAYS KNOW',
     line2: 'WHAT TO SAY',
     zoom: 'bottom',
-    zoomIn:  2500,
-    zoomOut: 8500,
-    exitAt:  13083, // 14033 - 950
-    nextAt:  14033,
+    // Scan pauses playback for scanDuration once the device is centred; every
+    // subsequent beat (zoom + exit) is pushed back by that same amount.
+    scan: true,
+    scanAt:       1000, // device has just glided to centre (0.95s transition)
+    scanDuration: 3200, // 1.6s down + 1.6s back up
+    // Zoom = original timing shifted by the 3.2s scan pause, plus 1.5s extra breathing
+    // room so the video plays on a beat after the scan before zooming (3.0s gap).
+    zoomIn:  7200,  // 2500 + 3200 + 1500 (scan ends at 4200 → 3.0s of playback first)
+    zoomOut: 13200, // 8500 + 3200 + 1500 (dwell stays 6000ms, same as before)
+    exitAt:  16283, // 13083 + 3200
+    nextAt:  17233, // 14033 + 3200
   },
   {
     key: 'improve-profile',
@@ -73,6 +85,7 @@ export default function FeatureReel() {
   const [pose, setPose] = useState<PoseType>('enter');
   const [animate, setAnimate] = useState(false);
   const [copyVisible, setCopyVisible] = useState(false);
+  const [scanActive, setScanActive] = useState(false);
 
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
 
@@ -111,6 +124,7 @@ export default function FeatureReel() {
       setAnimate(false);
       setPose('enter');
       setCopyVisible(false);
+      setScanActive(false);
 
       // Next frame: enable transition and glide to centre.
       raf1 = requestAnimationFrame(() => {
@@ -122,6 +136,19 @@ export default function FeatureReel() {
       });
 
       after(() => setCopyVisible(true), COPY_IN);
+
+      // Analysis scanline: freeze the frame once centred, sweep, then resume.
+      if (feature.scan && feature.scanAt != null && feature.scanDuration != null) {
+        const scanIdx = i;
+        after(() => {
+          videoRefs.current[scanIdx]?.pause();
+          setScanActive(true);
+        }, feature.scanAt);
+        after(() => {
+          setScanActive(false);
+          void videoRefs.current[scanIdx]?.play();
+        }, feature.scanAt + feature.scanDuration);
+      }
 
       if (feature.zoom !== 'none' && feature.zoomIn != null && feature.zoomOut != null) {
         const zoomPose: PoseType =
@@ -183,6 +210,9 @@ export default function FeatureReel() {
                   preload="auto"
                 />
               ))}
+
+              {/* Laser analysis scanline — sweeps the frozen frame edge-to-edge */}
+              <div className={`reel-scanline ${scanActive ? 'run' : ''}`} />
             </div>
           </div>
         </div>
@@ -283,6 +313,38 @@ const reelCss = `
     object-fit: cover;
     object-position: top center;
     transition: opacity 0.35s ease;
+  }
+
+  /* Laser scanline — full-width hot-pink bar sweeping the screen top→bottom→top */
+  .reel-scanline {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 4px;
+    z-index: 5;
+    opacity: 0;
+    pointer-events: none;
+    will-change: top, opacity;
+    background: linear-gradient(90deg,
+      rgba(255, 46, 136, 0) 0%,
+      #ff2e88 16%,
+      #ffffff 50%,
+      #ff2e88 84%,
+      rgba(255, 46, 136, 0) 100%);
+    box-shadow:
+      0 0 12px 3px rgba(255, 46, 136, 0.9),
+      0 0 34px 10px rgba(255, 46, 136, 0.55);
+  }
+  .reel-scanline.run {
+    animation: reelScan 3.2s ease-in-out forwards;
+  }
+  @keyframes reelScan {
+    0%   { top: 0;                 opacity: 0; }
+    6%   { opacity: 1; }
+    50%  { top: calc(100% - 3px);  opacity: 1; }
+    94%  { opacity: 1; }
+    100% { top: 0;                 opacity: 0; }
   }
 
   /* Subtle dark scrim anchors the copy over the phone screen */

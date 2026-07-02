@@ -13,7 +13,8 @@ import {
   VolumeX, 
   Lock, 
   X,
-  RefreshCw
+  RefreshCw,
+  SkipForward
 } from 'lucide-react';
 import secondRoundDataRaw from '../../RizzOnboarding/SecondRound.json';
 
@@ -481,7 +482,7 @@ export default function RizzOnboarding() {
     if (introTimerRef.current) clearTimeout(introTimerRef.current);
 
     if (flowState === 'intro-logo') {
-      introTimerRef.current = setTimeout(() => setFlowState('intro-rizz'), 3800);
+      introTimerRef.current = setTimeout(() => setFlowState('intro-rizz'), 1800);
     } else if (flowState === 'intro-rizz') {
       introTimerRef.current = setTimeout(() => setFlowState('intro-match'), 4000);
     } else if (flowState === 'chat-init') {
@@ -521,8 +522,79 @@ export default function RizzOnboarding() {
     };
   }, [flowState]);
 
+  // Typewriter Effect for Round 2 mission banner ("close the deal WITH AI")
+  const [typedMission, setTypedMission] = useState('');
+  const chloeMissionText = 'Your Mission: Close the deal — with AI';
+  useEffect(() => {
+    if (flowState === 'chat-chloe') {
+      setTypedMission('');
+      let index = 0;
+      const delay = setTimeout(() => {
+        const interval = setInterval(() => {
+          setTypedMission(chloeMissionText.substring(0, index + 1));
+          index++;
+          if (index >= chloeMissionText.length) clearInterval(interval);
+        }, 45);
+        // store on ref-free closure; cleared by outer cleanup via clearInterval below
+        (delay as any)._iv = interval;
+      }, 400);
+      return () => {
+        clearTimeout(delay);
+        if ((delay as any)._iv) clearInterval((delay as any)._iv);
+      };
+    } else if (flowState === 'success') {
+      // Keep the round-2 mission fully shown after the round ends
+      setTypedMission(chloeMissionText);
+    } else {
+      setTypedMission('');
+    }
+  }, [flowState]);
+
+  // Renders a "type it out" string but keeps the full text laid out (as transparent
+  // "ghost" text) so the box never resizes / shifts while typing. `boldLen` chars from
+  // the start are rendered bold (used for the "Your mission:" prefix).
+  const renderTyped = (full: string, typedLen: number, boldLen = 0) => {
+    const boldVisibleEnd = Math.min(typedLen, boldLen);
+    const showCursor = typedLen < full.length;
+    return (
+      <span className="typed-wrap">
+        <b>{full.substring(0, boldVisibleEnd)}</b>
+        {typedLen > boldLen && <span>{full.substring(boldLen, typedLen)}</span>}
+        {showCursor && <span className="typing-cursor">|</span>}
+        {boldLen > boldVisibleEnd && (
+          <b className="mission-ghost">{full.substring(boldVisibleEnd, boldLen)}</b>
+        )}
+        <span className="mission-ghost">{full.substring(Math.max(typedLen, boldLen))}</span>
+      </span>
+    );
+  };
+
+  // Typewriter Effect for Round 1 mission capsule — types out when the box appears
+  const [typedRound1Mission, setTypedRound1Mission] = useState('');
+  const round1MissionText = 'Your mission: flirt to get a date. You have 3 messages.';
+  const round1MissionBoldLen = 'Your mission:'.length;
+  useEffect(() => {
+    if (flowState === 'intro-match') {
+      if (matchStep >= 4) {
+        setTypedRound1Mission('');
+        let index = 0;
+        const interval = setInterval(() => {
+          setTypedRound1Mission(round1MissionText.substring(0, index + 1));
+          index++;
+          if (index >= round1MissionText.length) clearInterval(interval);
+        }, 40);
+        return () => clearInterval(interval);
+      } else {
+        setTypedRound1Mission('');
+      }
+    } else {
+      // Once past the match screen, keep the mission fully shown (no re-animation)
+      setTypedRound1Mission(round1MissionText);
+    }
+  }, [flowState, matchStep]);
+
   // Typewriter Effect for "Test your Rizz" subline
-  const fullSublineText = 'Can you close the deal?';
+  const fullSublineText = 'Can you close the deal in 3 messages?';
   useEffect(() => {
     if (flowState === 'intro-rizz') {
       setTypedSubline('');
@@ -566,17 +638,7 @@ export default function RizzOnboarding() {
         setMatchStep(1);
       }, 100);
 
-      // Step 2: "You matched with Jade" pill (matchStep = 2) at 1200ms
-      const timer2 = setTimeout(() => {
-        setMatchStep(2);
-      }, 1200);
-
-      // Step 3: Bio text (matchStep = 3) at 2500ms
-      const timer3 = setTimeout(() => {
-        setMatchStep(3);
-      }, 2500);
-
-      // Step 4: Instructions capsule (matchStep = 4) at 3800ms
+      // Step 4: Mission capsule (matchStep = 4) — pill & bio removed, so reveal promptly
       const timer4 = setTimeout(() => {
         setMatchStep(4);
         setTimeout(() => {
@@ -587,12 +649,10 @@ export default function RizzOnboarding() {
             });
           }
         }, 150);
-      }, 3800);
+      }, 1400);
 
       return () => {
         clearTimeout(timer1);
-        clearTimeout(timer2);
-        clearTimeout(timer3);
         clearTimeout(timer4);
       };
     } else {
@@ -629,33 +689,75 @@ export default function RizzOnboarding() {
     scrollToBottom();
   };
 
-  const handleStartChat = (autoplay: boolean) => {
+  // Boot the second (AI-assisted) round, optionally fully automated.
+  const startSecondRound = (autoplay: boolean) => {
+    clearAutoplayTimers();
+    setInputText('');
+    if (inputRef.current) inputRef.current.textContent = '';
     setIsAutoplay(autoplay);
-    if (autoplay) {
-      setJadeMessages([]);
-      setChloeMessages([
-        {
-          id: 'chloe-init',
-          type: 'Received',
-          text: secondRoundData.nodes['1_Initial'].chloe_message,
-        },
-      ]);
-      setCurrentNodeId('1_Initial');
-      setChloeScore(5.0);
-      setIsCustomKeyboardState('initial');
-      setFlowState('chat-chloe');
-      
-      setTimeout(() => {
-        setIsKeyboardExpanded(true);
-        inputRef.current?.focus();
-        scrollToBottom();
-      }, 500);
+    setJadeMessages([]);
+    setChloeMessages([
+      {
+        id: 'chloe-init',
+        type: 'Received',
+        text: secondRoundData.nodes['1_Initial'].chloe_message,
+      },
+    ]);
+    setCurrentNodeId('1_Initial');
+    setChloeScore(5.0);
+    setIsCustomKeyboardState('initial');
+    setFlowState('chat-chloe');
 
+    setTimeout(() => {
+      setIsKeyboardExpanded(true);
+      inputRef.current?.focus();
+      scrollToBottom();
+    }, 500);
+  };
+
+  const handleStartChat = (autoplay: boolean) => {
+    if (autoplay) {
+      startSecondRound(true);
       trackEvent('Onboarding Start Autoplay');
     } else {
+      setIsAutoplay(false);
       handleTransitionToChatInit();
       trackEvent('Onboarding Start Interactive');
     }
+  };
+
+  // --- Floating flow controls (Skip / Automate) ---
+  // "Skip": Round 1 → jump to the second round but still MANUAL; Round 2 → skip straight to
+  // the success button's destination (the paywall/onboarding page), not the win card itself.
+  const handleSkip = () => {
+    if (flowState === 'chat-chloe') {
+      clearAutoplayTimers();
+      trackEvent('Onboarding Skip Clicked', { from: flowState, to: 'success-destination' });
+      handleSuccessCtaClick();
+      return;
+    }
+    startSecondRound(false);
+    trackEvent('Onboarding Skip Clicked', { from: flowState, to: 'second-round-manual' });
+  };
+
+  // "Automate": Round 1 → play the rewind animation, then start the second round FULLY automated;
+  // Round 2 → pick up here and continue the AI automation.
+  const handleAutomate = () => {
+    if (flowState === 'chat-chloe') {
+      if (isAutoplay) return;
+      setInputText('');
+      if (inputRef.current) inputRef.current.textContent = '';
+      setIsAutoplay(true);
+      trackEvent('Onboarding Automate Clicked', { from: flowState, to: 'continue-automation' });
+      return;
+    }
+    // Round 1: rewind first, then hand off to the automated second round.
+    clearAutoplayTimers();
+    setInputText('');
+    if (inputRef.current) inputRef.current.textContent = '';
+    setIsAutoplay(true);
+    handleVcrRewind();
+    trackEvent('Onboarding Automate Clicked', { from: flowState, to: 'rewind-then-auto' });
   };
 
   const simulateTypeMessage = (text: string, onComplete: () => void) => {
@@ -1872,7 +1974,14 @@ export default function RizzOnboarding() {
         }
 
         .chat-container.chloe-active .chat-messages-stream {
-          padding-bottom: 290px; /* 275px keyboard height + 15px margin/breathing room */
+          /* 275px keyboard + ~34px floating controls + breathing room, so her latest
+             messages never sit behind the Skip/Automate buttons */
+          padding-bottom: 344px;
+        }
+
+        /* Round 1: leave room above the input bar for the floating Skip/Automate controls */
+        .chat-container.jade-active .chat-messages-stream {
+          padding-bottom: 72px;
         }
 
         .kbd-glow-lottie-container {
@@ -2497,19 +2606,24 @@ export default function RizzOnboarding() {
         }
 
         .match-prompt-capsule {
+          position: relative;
+          overflow: hidden;
           opacity: 0;
           transform: translate3d(0, 15px, 0);
           transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 16px;
-          padding: 10px 16px;
+          padding: 12px 18px;
           font-size: 0.8rem;
           color: rgba(255, 255, 255, 0.85);
           line-height: 1.4;
-          text-align: center;
-          max-width: 90%;
-          font-style: italic;
+          text-align: left;
+          /* Fixed to the same width as the choice buttons below, so the box never
+             resizes or shifts while the text types out */
+          width: 100%;
+          max-width: 300px;
+          box-sizing: border-box;
           z-index: 2;
           will-change: opacity, transform;
         }
@@ -2518,6 +2632,7 @@ export default function RizzOnboarding() {
           opacity: 1;
           transform: translate3d(0, 0, 0);
         }
+
         .disabled-interaction {
           pointer-events: none !important;
         }
@@ -2542,15 +2657,36 @@ export default function RizzOnboarding() {
           background: rgba(20, 20, 25, 0.85);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
-          border: 1px solid rgba(66, 239, 188, 0.3);
+          border: 1px solid rgba(66, 239, 188, 0.6);
           border-radius: 100px;
           padding: 10px 18px; /* increased padding for height */
           display: flex;
           align-items: center;
           z-index: 500;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(66, 239, 188, 0.2);
-          animation: slideDownBadge 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          /* Border + glow cycle through the same colors as the ambient screen glow */
+          animation: slideDownBadge 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+                     showcaseBorderGlow 4s ease-in-out infinite;
           pointer-events: auto; /* allow clicking the exit button inside it */
+        }
+
+        /* Matches the green→blue→violet cycle of .ai-glow-frame (aiGlowOutline) */
+        @keyframes showcaseBorderGlow {
+          0% {
+            border-color: rgba(66, 239, 188, 0.7);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(66, 239, 188, 0.45);
+          }
+          33% {
+            border-color: rgba(37, 99, 235, 0.75);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(37, 99, 235, 0.5);
+          }
+          66% {
+            border-color: rgba(167, 139, 250, 0.8);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(167, 139, 250, 0.5);
+          }
+          100% {
+            border-color: rgba(66, 239, 188, 0.7);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(66, 239, 188, 0.45);
+          }
         }
 
         @keyframes slideDownBadge {
@@ -2604,6 +2740,146 @@ export default function RizzOnboarding() {
         .autoplay-exit-btn:hover {
           background: rgba(255, 255, 255, 0.2);
           transform: scale(1.05);
+        }
+
+        /* Floating controls: Skip / Automate */
+        .flow-controls-overlay {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          z-index: 500;
+          animation: floatUpControls 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          pointer-events: auto;
+        }
+
+        /* Round 1: float just above the text input bar */
+        .flow-controls-overlay.round1 { bottom: 100px; }
+        /* Round 2: float just above the AI keyboard (275px tall) */
+        .flow-controls-overlay.round2 { bottom: 292px; }
+
+        @keyframes floatUpControls {
+          from { opacity: 0; transform: translate(-50%, 12px); }
+          to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        .flow-control-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(20, 20, 25, 0.85);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.15);
+          color: rgba(255, 255, 255, 0.85);
+          padding: 7px 13px;
+          border-radius: 100px;
+          font-size: 0.78rem;
+          font-weight: 700;
+          font-family: inherit;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .flow-control-btn:hover {
+          background: rgba(40, 40, 48, 0.9);
+          color: #ffffff;
+          transform: translateY(-1px);
+        }
+
+        .flow-control-btn.automate {
+          background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(66, 239, 188, 0.25));
+          border: 1px solid rgba(66, 239, 188, 0.4);
+          color: #42efbc;
+        }
+
+        .flow-control-btn.automate:hover {
+          background: linear-gradient(135deg, rgba(37, 99, 235, 0.4), rgba(66, 239, 188, 0.4));
+          color: #ffffff;
+          box-shadow: 0 4px 15px rgba(66, 239, 188, 0.25);
+        }
+
+        /* Shine sweep across the mission box when it appears */
+        .match-prompt-capsule::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 60%;
+          height: 100%;
+          background: linear-gradient(115deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+          transform: translateX(-180%) skewX(-18deg);
+          pointer-events: none;
+          z-index: 3;
+        }
+
+        .match-prompt-capsule.in::after {
+          animation: missionShine 1.2s ease-out 0.15s 1;
+        }
+
+        /* Round 2: reuse the same box, switch to purple, re-pop + re-shine + type-out */
+        .match-prompt-capsule.round2 {
+          background: rgba(20, 16, 30, 0.92);
+          border-color: rgba(167, 139, 250, 0.5);
+          color: #c4b5fd;
+          text-shadow: 0 0 12px rgba(167, 139, 250, 0.45);
+          animation: missionPop 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+                     missionPulse 2s ease-in-out 0.7s infinite;
+        }
+
+        .match-prompt-capsule.round2 b {
+          color: #ffffff;
+        }
+
+        .match-prompt-capsule.round2::after {
+          animation: missionShine 1.2s ease-out 0.45s 1;
+        }
+
+        @keyframes missionPop {
+          0% { transform: scale(0.85); opacity: 0; }
+          55% { transform: scale(1.04); opacity: 1; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes missionShine {
+          0% { transform: translateX(-180%) skewX(-18deg); }
+          100% { transform: translateX(320%) skewX(-18deg); }
+        }
+
+        /* Typed-out helper: transparent "ghost" text reserves the final size */
+        .typed-wrap { white-space: inherit; }
+        .mission-ghost { color: transparent; }
+
+        /* Her name on the match screen (kept — replaces the old green pill) */
+        .match-name {
+          opacity: 0;
+          transform: translate3d(0, 12px, 0);
+          transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: #ffffff;
+          letter-spacing: 0.01em;
+          margin-bottom: 1.5rem;
+          z-index: 2;
+        }
+
+        .match-name.in {
+          opacity: 1;
+          transform: translate3d(0, 0, 0);
+        }
+
+        @keyframes missionPulse {
+          0%, 100% {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 18px rgba(167, 139, 250, 0.35);
+            border-color: rgba(167, 139, 250, 0.5);
+          }
+          50% {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(167, 139, 250, 0.7);
+            border-color: rgba(196, 181, 253, 0.85);
+          }
         }
 
         .match-choice-buttons {
@@ -2662,6 +2938,35 @@ export default function RizzOnboarding() {
           transform: translateY(-2px);
           box-shadow: 0 4px 15px rgba(66, 239, 188, 0.2);
         }
+
+        /* AI-controlled ambient glow outline around the whole screen (Siri / Claude) */
+        .ai-glow-frame {
+          position: absolute;
+          inset: 0;
+          border-radius: 38px;
+          pointer-events: none;
+          z-index: 400;
+          animation: aiGlowOutline 4s ease-in-out infinite;
+        }
+
+        @keyframes aiGlowOutline {
+          0% {
+            box-shadow: inset 0 0 22px 2px rgba(66, 239, 188, 0.55),
+                        inset 0 0 60px 6px rgba(66, 239, 188, 0.12);
+          }
+          33% {
+            box-shadow: inset 0 0 28px 3px rgba(37, 99, 235, 0.6),
+                        inset 0 0 70px 8px rgba(37, 99, 235, 0.14);
+          }
+          66% {
+            box-shadow: inset 0 0 28px 3px rgba(167, 139, 250, 0.6),
+                        inset 0 0 70px 8px rgba(167, 139, 250, 0.14);
+          }
+          100% {
+            box-shadow: inset 0 0 22px 2px rgba(66, 239, 188, 0.55),
+                        inset 0 0 60px 6px rgba(66, 239, 188, 0.12);
+          }
+        }
       `}</style>
 
       {/* Ambient background decoration */}
@@ -2681,6 +2986,9 @@ export default function RizzOnboarding() {
           onMouseDown={handleIntroMouseDown}
           onMouseUp={handleIntroMouseUp}
         >
+          {/* --- AI-controlled ambient glow outline (Siri/Claude style) --- */}
+          {isAutoplay && <div className="ai-glow-frame"></div>}
+
           {/* --- Autoplay Showcase Mode Overlay --- */}
           {isAutoplay && (
             <div className="autoplay-badge-overlay">
@@ -2693,7 +3001,22 @@ export default function RizzOnboarding() {
               </button>
             </div>
           )}
-          
+
+          {/* --- Floating flow controls (Skip / Automate) --- */}
+          {/* Round 1 (manual): float above the input bar. Round 2: float above the AI keyboard. */}
+          {((['chat-init', 'chat-jade'].includes(flowState) && !isAutoplay) || flowState === 'chat-chloe') && (
+            <div className={`flow-controls-overlay ${flowState === 'chat-chloe' ? 'round2' : 'round1'}`}>
+              <button className="flow-control-btn" onClick={handleSkip}>
+                Skip <SkipForward size={13} />
+              </button>
+              {!isAutoplay && (
+                <button className="flow-control-btn automate" onClick={handleAutomate}>
+                  <Sparkles size={13} /> Automate
+                </button>
+              )}
+            </div>
+          )}
+
           {/* --- VCR Rewind Overlay --- */}
           {flowState === 'rewinding' && (
             <div className="vcr-overlay">
@@ -2737,6 +3060,8 @@ export default function RizzOnboarding() {
             isIntroActive ? 'is-intro' : ''
           } ${
             flowState === 'chat-chloe' ? 'chloe-active' : ''
+          } ${
+            ['chat-init', 'chat-jade'].includes(flowState) ? 'jade-active' : ''
           } ${
             isAutoplay ? 'disabled-interaction' : ''
           }`}>
@@ -2782,24 +3107,22 @@ export default function RizzOnboarding() {
                       </div>
                     </div>
 
-                    {/* Step 2: "You matched with Jade" Pill */}
-                    <div className={`match-pill ${matchStep >= 2 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
-                      <Sparkles size={14} className="match-pill-icon" />
-                      You matched with Jade
+                    {/* Her name + age (kept — no green pill, no bio) */}
+                    <div className={`match-name ${matchStep >= 1 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
+                      Jade, 24
                     </div>
 
-                    {/* Step 3: Bio Text */}
-                    <div className={`match-bio-box ${matchStep >= 3 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
-                      <div className="match-bio-header">Bio:</div>
-                      <p className="match-bio-text">
-                        "I judge you by your Spotify wrapped and your cocktail order. Fluent in sarcasm. If your first message is just 'hey,' I'm already asleep."
-                      </p>
-                    </div>
-
-                    {/* Step 4: Prompt/Instructions Capsule */}
-                    <div className={`match-prompt-capsule ${matchStep >= 4 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
-                      Show her what you got to seal the deal and get a date.
-                    </div>
+                    {/* Step 4: Mission capsule — reused for Round 2 (purple, re-pops + types out) */}
+                    {(() => {
+                      const isR2 = ['chat-chloe', 'success'].includes(flowState);
+                      return (
+                        <div className={`match-prompt-capsule ${isR2 ? 'round2' : ''} ${matchStep >= 4 || ['chat-init', 'chat-jade', 'rewinding', 'chat-chloe', 'success'].includes(flowState) ? 'in' : ''}`}>
+                          {isR2
+                            ? renderTyped(chloeMissionText, typedMission.length, 'Your Mission:'.length)
+                            : renderTyped(round1MissionText, typedRound1Mission.length, round1MissionBoldLen)}
+                        </div>
+                      );
+                    })()}
 
                     {/* Step 5: Options for Manual vs Autoplay Showcase */}
                     {flowState === 'intro-match' && matchStep >= 4 && (
@@ -2915,7 +3238,7 @@ export default function RizzOnboarding() {
                     Your manual replies didn't hit the mark. Jade got bored and matches are slipping away...
                   </p>
                   <button className="fail-btn" onClick={handleVcrRewind}>
-                    <RotateCcw size={16} /> Let’s try again with AI
+                    <RotateCcw size={16} /> Try again with AI
                   </button>
                 </div>
               )}
