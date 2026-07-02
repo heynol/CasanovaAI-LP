@@ -270,13 +270,20 @@ export default function RizzOnboarding() {
     }
   };
 
+  // Don't hijack taps that land on interactive controls (buttons/links/inputs) — otherwise the
+  // intro tap-to-advance handler's preventDefault swallows the control's click (notably on mobile).
+  const isInteractiveTarget = (target: EventTarget | null) =>
+    !!(target as HTMLElement)?.closest?.('button, a, input, textarea, [role="button"], .real-input');
+
   const handleIntroTouchStart = (e: React.TouchEvent) => {
     if (!['intro-logo', 'intro-rizz', 'intro-match'].includes(flowState)) return;
+    if (isInteractiveTarget(e.target)) return;
     introTouchStartY.current = e.touches[0].clientY;
   };
 
   const handleIntroTouchEnd = (e: React.TouchEvent) => {
     if (!['intro-logo', 'intro-rizz', 'intro-match'].includes(flowState)) return;
+    if (isInteractiveTarget(e.target)) return;
     if (introTouchStartY.current === null) return;
     // Prevent the browser from generating synthetic mouse/click events after touch
     e.preventDefault();
@@ -286,6 +293,7 @@ export default function RizzOnboarding() {
 
   const handleIntroMouseDown = (e: React.MouseEvent) => {
     if (!['intro-logo', 'intro-rizz', 'intro-match'].includes(flowState)) return;
+    if (isInteractiveTarget(e.target)) return;
     introMouseStartY.current = e.clientY;
   };
 
@@ -293,6 +301,7 @@ export default function RizzOnboarding() {
   // Fires for both taps (diffY ≈ 0) and swipes (diffY > threshold).
   const handleIntroMouseUp = (e: React.MouseEvent) => {
     if (!['intro-logo', 'intro-rizz', 'intro-match'].includes(flowState)) return;
+    if (isInteractiveTarget(e.target)) return;
     if (introMouseStartY.current === null) return;
     introMouseStartY.current = null;
     handleNextState();
