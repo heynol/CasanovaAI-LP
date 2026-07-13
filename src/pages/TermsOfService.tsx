@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
 import tosText from '../assets/legal/tos.txt?raw';
 
 export default function TermsOfService() {
@@ -13,8 +14,8 @@ export default function TermsOfService() {
       
       <div className="glass-card" style={{ padding: '4rem' }}>
         <h1 className="text-gradient-accent" style={{ fontSize: '3rem', marginBottom: '2rem' }}>Terms of Service</h1>
-        <div style={{ whiteSpace: 'pre-wrap', wordWrap: 'break-word', overflowWrap: 'break-word', wordBreak: 'break-word', color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.8' }}>
-          {tosText}
+        <div style={{ wordWrap: 'break-word', overflowWrap: 'break-word', wordBreak: 'break-word', color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: '1.8' }}>
+          <ReactMarkdown>{tosText}</ReactMarkdown>
         </div>
       </div>
     </div>
