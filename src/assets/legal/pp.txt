@@ -1,19 +1,13 @@
-24.2.2026, 15.34
-Page 1 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ated.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 PRIVACY NOTICE
 Last updated February 24, 2026
 This privacy notice for Polemur Limited ("Company," "we," "us," or "our"),
 describes how and why we might collect, store, use, and/or share ("process")
 your information when you use our services ("Services"), such as when you:
-●
-Visit our website at www.getcasanova.ai, or any website of ours that
+- Visit our website at www.getcasanova.ai, or any website of ours that
 links to this privacy notice
-●
-Download and use our mobile application (Casanova AI), or any other
+- Download and use our mobile application (Casanova AI), or any other
 application of ours that links to this privacy notice
-●
-Engage with us in other related ways, including any sales, marketing,
+- Engage with us in other related ways, including any sales, marketing,
 or events
 Questions or concerns? Reading this privacy notice will help you understand
 your privacy rights and choices. If you do not agree with our policies and
@@ -31,9 +25,6 @@ interact with Casanova AI and the Services, the choices you make, and the
 products and features you use.
 Do we process any sensitive personal information? We do not process
 
-24.2.2026, 15.34
-Page 2 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ated.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 sensitive personal information.
 Do we receive any information from third parties? We do not receive any
 information from third parties.
@@ -72,9 +63,6 @@ INFORMATION?
 8. HOW LONG DO WE KEEP YOUR INFORMATION?
 9. HOW DO WE KEEP YOUR INFORMATION SAFE?
 
-24.2.2026, 15.34
-Page 3 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ated.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 10. DO WE COLLECT INFORMATION FROM MINORS?
 11. WHAT ARE YOUR PRIVACY RIGHTS?
 12. CONTROLS FOR DO-NOT-TRACK FEATURES
@@ -94,33 +82,23 @@ Personal Information Provided by You. The personal information that we
 collect depends on the context of your interactions with us and the Services,
 the choices you make, and the products and features you use. The personal
 information we collect may include the following:
-●
-Text messages and replies generated through the app
-●
-Email address and name if you contact us via email
+- Text messages and replies generated through the app
+- Email address and name if you contact us via email
 FACE DATA (PHOTOS)
 We collect and process photos you choose to upload to the AI Photo Studio
 feature. These photos may contain face data (biometric identiﬁers derived
 from facial features).
 How we use this data:
-●
-To generate AI-enhanced photos requested by you.
+- To generate AI-enhanced photos requested by you.
 Third-party sharing and processing:
-●
-We share uploaded photos with our AI processing providers, OpenAI
+- We share uploaded photos with our AI processing providers, OpenAI
 and Google (Gemini), solely to deliver AI Photo Studio.
 
-24.2.2026, 15.34
-Page 4 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ated.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
-●
-The providers’ privacy policies apply to their processing of the data.
+- The providers’ privacy policies apply to their processing of the data.
 Storage and retention:
-●
-Uploaded photos are processed and then deleted immediately after
+- Uploaded photos are processed and then deleted immediately after
 processing.
-●
-Generated photos are stored until you download them and
+- Generated photos are stored until you download them and
 immediately deleted from our server.
 Legal basis and consent:
 We process face data only with your explicit consent, obtained in the app
@@ -133,12 +111,12 @@ Payment Data. We may collect data necessary to process your payment if
 you make purchases, such as your payment instrument number, and the
 security code associated with your payment instrument. All payment data is
 stored by Apple and Google. You may ﬁnd their privacy notice link(s) here:
-https://www.apple.com/legal/privacy/data/en/app-store/ and
-https://policies.google.com/privacy .
+https://www.apple.com/legal/privacy/data/en/app-store/ ,
+https://policies.google.com/privacy , and
+https://legal.appvestor.com/privacy-policy .
 Application Data. If you use our application(s), we also may collect the
 following information if you choose to provide us with access or permission:
-●
-Mobile Device Data. We automatically collect device information
+- Mobile Device Data. We automatically collect device information
 (such as your mobile device ID, model, and manufacturer), operating
 system, version information and system conﬁguration information,
 device and application identiﬁcation numbers, browser type and
@@ -149,8 +127,7 @@ phone network associated with your mobile device, your mobile
 device’s operating system or platform, the type of mobile device you
 use, your mobile device’s unique device ID, and information about the
 features of our application(s) you accessed.
-●
-Push Notiﬁcations. We may request to send you push notiﬁcations
+- Push Notiﬁcations. We may request to send you push notiﬁcations
 regarding your account or certain features of the application(s). If you
 wish to opt out from receiving these types of communications, you
 may turn them off in your device's settings.
@@ -161,9 +138,6 @@ All personal information that you provide to us must be true, complete, and
 accurate, and you must notify us of any changes to such personal
 information.
 
-24.2.2026, 15.34
-Page 5 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ated.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 Information automatically collected
 In Short: Some information – such as your Internet Protocol (IP) address
 and/or browser and device characteristics – is collected automatically when
@@ -180,8 +154,7 @@ reporting purposes.
 Like many businesses, we also collect information through cookies and
 similar technologies.  
 The information we collect includes:
-●
-Log and Usage Data. Log and usage data is service-related, diagnostic,
+- Log and Usage Data. Log and usage data is service-related, diagnostic,
 usage, and performance information our servers automatically collect
 when you access or use our Services and which we record in log ﬁles.
 Depending on how you interact with us, this log data may include
@@ -191,16 +164,14 @@ stamps associated with your usage, pages and ﬁles viewed, searches,
 and other actions you take such as which features you use), device
 event information (such as system activity, error reports (sometimes
 called "crash dumps"), and hardware settings).
-●
-Device Data. We collect device data such as information about your
+- Device Data. We collect device data such as information about your
 computer, phone, tablet, or other device you use to access the
 Services. Depending on the device used, this device data may include
 information such as your IP address (or proxy server), device and
 application identiﬁcation numbers, location, browser type, hardware
 model, Internet service provider and/or mobile carrier, operating
 system, and system conﬁguration information.
-●
-Location Data. We collect location data such as information about
+- Location Data. We collect location data such as information about
 your device's location, which can be either precise or imprecise. How
 much information we collect depends on the type and settings of the
 device you use to access the Services. For example, we may use GPS
@@ -211,9 +182,6 @@ information or by disabling your Location setting on your device.
 However, if you choose to opt out, you may not be able to use certain
 aspects of the Services.
 
-24.2.2026, 15.34
-Page 6 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ated.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 2. HOW DO WE PROCESS YOUR INFORMATION?
 In Short: We process your information to provide, improve, and administer
 our Services, communicate with you, for security and fraud prevention, and
@@ -221,49 +189,37 @@ to comply with law. We may also process your information for other
 purposes with your consent.
 We process your personal information for a variety of reasons, depending
 on how you interact with our Services, including:
-●
-To deliver and facilitate delivery of services to the user. We may
+- To deliver and facilitate delivery of services to the user. We may
 process your information to provide you with the requested service.
-●
-To respond to user inquiries/offer support to users. We may process
+- To respond to user inquiries/offer support to users. We may process
 your information to respond to your inquiries and solve any potential
 issues you might have with the requested service.
-●
-To send administrative information to you. We may process your
+- To send administrative information to you. We may process your
 information to send you details about our products and services,
 changes to our terms and policies, and other similar information.
-●
-To fulﬁll and manage your orders. We may process your information
+- To fulﬁll and manage your orders. We may process your information
 to fulﬁll and manage your orders, payments, returns, and exchanges
 made through the Services.
-●
-To request feedback. We may process your information when
+- To request feedback. We may process your information when
 necessary to request feedback and to contact you about your use of
 our Services.
-●
-To protect our Services. We may process your information as part of
+- To protect our Services. We may process your information as part of
 our efforts to keep our Services safe and secure, including fraud
 monitoring and prevention.
-●
-To identify usage trends. We may process information about how you
+- To identify usage trends. We may process information about how you
 use our Services to better understand how they are being used so we
 can improve them.
-●
-To determine the effectiveness of our marketing and promotional
+- To determine the effectiveness of our marketing and promotional
 campaigns. We may process your information to better understand
 how to provide marketing and promotional campaigns that are most
 relevant to you.
-●
-To save or protect an individual's vital interest. We may process your
+- To save or protect an individual's vital interest. We may process your
 information when necessary to save or protect an individual’s vital
 interest, such as to prevent harm.
 3. WHAT LEGAL BASES DO WE RELY ON TO
 PROCESS YOUR INFORMATION?
 In Short: We only process your personal information when we believe it is
 
-24.2.2026, 15.34
-Page 7 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ated.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 necessary and we have a valid legal reason (i.e., legal basis) to do so under
 applicable law, like with your consent, to comply with laws, to provide you
 with services to enter into or fulﬁll our contractual obligations, to protect
@@ -273,17 +229,14 @@ The General Data Protection Regulation (GDPR) and UK GDPR require us to
 explain the valid legal bases we rely on in order to process your personal
 information. As such, we may rely on the following legal bases to process
 your personal information:
-●
-Consent. We may process your information if you have given us
+- Consent. We may process your information if you have given us
 permission (i.e., consent) to use your personal information for a
 speciﬁc purpose. You can withdraw your consent at any time.
-●
-Performance of a Contract. We may process your personal
+- Performance of a Contract. We may process your personal
 information when we believe it is necessary to fulﬁll our contractual
 obligations to you, including providing our Services or at your request
 prior to entering into a contract with you.  
-●
-Legitimate Interests. We may process your information when we
+- Legitimate Interests. We may process your information when we
 believe it is reasonably necessary to achieve our legitimate business
 interests and those interests do not outweigh your interests and
 fundamental rights and freedoms. For example, we may process your
@@ -298,14 +251,12 @@ Diagnose problems and/or prevent fraudulent activities
 ○
 Understand how our users use our products and services so
 we can improve user experience
-●
-Legal Obligations. We may process your information where we
+- Legal Obligations. We may process your information where we
 believe it is necessary for compliance with our legal obligations, such
 as to cooperate with a law enforcement body or regulatory agency,
 exercise or defend our legal rights, or disclose your information as
 evidence in litigation in which we are involved.
-●
-Vital Interests. We may process your information where we believe it
+- Vital Interests. We may process your information where we believe it
 is necessary to protect your vital interests or the vital interests of a
 third party, such as situations involving potential threats to the safety
 of any person.
@@ -316,37 +267,25 @@ or in situations where your permission can be inferred (i.e., implied consent).
 You can withdraw your consent at any time.
 In some exceptional cases, we may be legally permitted under applicable law
 
-24.2.2026, 15.34
-Page 8 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ated.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 to process your information without your consent, including, for example:
-●
-If collection is clearly in the interests of an individual and consent
+- If collection is clearly in the interests of an individual and consent
 cannot be obtained in a timely way  
-●
-For investigations and fraud detection and prevention
-●
-For business transactions provided certain conditions are met  
-●
-If it is contained in a witness statement and the collection is
+- For investigations and fraud detection and prevention
+- For business transactions provided certain conditions are met  
+- If it is contained in a witness statement and the collection is
 necessary to assess, process, or settle an insurance claim
-●
-If it is reasonable to expect collection and use with consent would
+- If it is reasonable to expect collection and use with consent would
 compromise the availability or the accuracy of the information and
 the collection is reasonable for purposes related to investigating a
 breach of an agreement or a contravention of the laws of Canada or a
 province
-●
-If disclosure is required to comply with a subpoena, warrant, court
+- If disclosure is required to comply with a subpoena, warrant, court
 order, or rules of the court relating to the production of records
-●
-If it was produced by an individual in the course of their employment,
+- If it was produced by an individual in the course of their employment,
 business, or profession and the collection is consistent with the
 purposes for which the information was produced
-●
-If the collection is solely for journalistic, artistic, or literary purposes  
-●
-If the information is publicly available and is speciﬁed by the
+- If the collection is solely for journalistic, artistic, or literary purposes  
+- If the information is publicly available and is speciﬁed by the
 regulations
 4. WHEN AND WITH WHOM DO WE SHARE YOUR
 PERSONAL INFORMATION?
@@ -363,39 +302,24 @@ not share your personal information with any organization apart from us.
 They also commit to protect the data they hold on our behalf and to retain it
 for the period we instruct. The categories of third parties we may share
 personal information with are as follows:
-●
-Cloud Computing Services
-●
-Communication & Collaboration Tools
-●
-Performance Monitoring Tools
+- Cloud Computing Services
+- Communication & Collaboration Tools
+- Performance Monitoring Tools
 
-24.2.2026, 15.34
-Page 9 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ated.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
-●
-Payment Processors
-●
-Order Fulﬁllment Service Providers
-●
-Data Analytics Services
-●
-Product Engineering & Design Tools
-●
-Website Hosting Service Providers
-●
-Data Storage Service Providers
-●
-Finance & Accounting Tools
+- Payment Processors
+- Order Fulﬁllment Service Providers
+- Data Analytics Services
+- Product Engineering & Design Tools
+- Website Hosting Service Providers
+- Data Storage Service Providers
+- Finance & Accounting Tools
 We also may need to share your personal information in the following
 situations:
-●
-Business Transfers. We may share or transfer your information in
+- Business Transfers. We may share or transfer your information in
 connection with, or during negotiations of, any merger, sale of
 company assets, ﬁnancing, or acquisition of all or a portion of our
 business to another company.
-●
-Afﬁliates. We may share your information with our afﬁliates, in which
+- Afﬁliates. We may share your information with our afﬁliates, in which
 case we will require those afﬁliates to honor this privacy notice.
 Afﬁliates include our parent company and any subsidiaries, joint
 venture partners, or other companies that we control or that are
@@ -420,9 +344,6 @@ services, or applications that may be linked to or from the Services. You
 should review the policies of such third parties and contact them directly to
 respond to your questions.
 
-24.2.2026, 15.34
-Page 10 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ted.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 6. DO WE USE COOKIES AND OTHER TRACKING
 TECHNOLOGIES?
 In Short: We may use cookies and other tracking technologies to collect and
@@ -459,9 +380,6 @@ request. We have implemented similar appropriate safeguards with our
 third-party service providers and partners and further details can be
 provided upon request.
 
-24.2.2026, 15.34
-Page 11 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ted.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 8. HOW LONG DO WE KEEP YOUR
 INFORMATION?
 In Short: We keep your information for as long as necessary to fulﬁll the
@@ -494,9 +412,6 @@ only access the Services within a secure environment.
 MINORS?
 In Short: We do not knowingly collect data from or market to children under
 
-24.2.2026, 15.34
-Page 12 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ted.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 18 years of age.
 We do not knowingly solicit data from or market to children under 18 years
 of age. By using the Services, you represent that you are at least 18 or that
@@ -540,9 +455,6 @@ However, please note that this will not affect the lawfulness of the processing
 before its withdrawal nor, when applicable law allows, will it affect the
 processing of your personal information conducted in reliance on lawful
 
-24.2.2026, 15.34
-Page 13 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ted.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 processing grounds other than consent.
 Cookies and similar technologies: Most Web browsers are set to accept
 cookies by default. If you prefer, you can usually choose to set your browser
@@ -582,9 +494,6 @@ data that you publicly post on the Services. To request removal of such data,
 please contact us using the contact information provided below and include
 the email address associated with your account and a statement that you
 
-24.2.2026, 15.34
-Page 14 of 15
-https://firebasestorage.googleapis.com/v0/b/batmanventures-523…ted.html?alt=media&token=a6057293-3012-435e-9347-3d2a6df422a9
 reside in California. We will make sure the data is not publicly displayed on
 the Services, but please be aware that the data may not be completely or
 comprehensively removed from all our systems (e.g., backups, etc.).
