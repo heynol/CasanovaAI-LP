@@ -3271,12 +3271,12 @@ export default function RizzOnboardingV1() {
                   >
                     {chloeScore >= 8.0 && '🔥 '}{chloeScore.toFixed(1)} / 10
                   </div>
-                  <h4 className="success-title">Vibe Secured!</h4>
+                  <h4 className="success-title">Your AI Wingman</h4>
                   <p className="success-desc">
                     Outstanding match performance. AI-generated options bypassed obstacles and secured the date.
                   </p>
                   <button className="success-cta" onClick={handleSuccessCtaClick}>
-                    <Sparkles size={16} /> Let AI message for you
+                    <Sparkles size={16} /> Unlock your AI secret superpower
                   </button>
                 </div>
               )}
