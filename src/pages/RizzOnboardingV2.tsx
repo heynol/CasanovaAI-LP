@@ -114,6 +114,12 @@ export default function RizzOnboardingV2() {
 
   // Autoplay Showcase mode states and refs
   const [isAutoplay, setIsAutoplay] = useState<boolean>(false);
+  const [fingerAction, setFingerAction] = useState<{ active: boolean, type: 'tap' | 'swipe', x: string, y: string }>({
+    active: false,
+    type: 'tap',
+    x: '50%',
+    y: '50%'
+  });
   const autoplayTimersRef = useRef<any[]>([]);
   const typingIntervalRef = useRef<any>(null);
 
@@ -143,43 +149,49 @@ export default function RizzOnboardingV2() {
       if (apiInteractionCount === 0 && !isAwaitingAPI && jadeMessages.length === 1 && inputText === '') {
         const timer = setTimeout(() => {
           simulateTypeMessage("Haha I'm hilarious. Trust me, I'm the funny guy in my friend group.", () => {
+            setFingerAction({ active: true, type: 'tap', x: '92%', y: '93%' });
             const timerSend = setTimeout(() => {
+              setFingerAction({ active: false, type: 'tap', x: '92%', y: '93%' });
               handleSendJadeMessage();
-            }, 1500);
+            }, 1000);
             autoplayTimersRef.current.push(timerSend);
           });
-        }, 2500);
+        }, 1500);
         autoplayTimersRef.current.push(timer);
       }
       
       else if (apiInteractionCount === 1 && !isAwaitingAPI && inputText === '') {
         const timer = setTimeout(() => {
           simulateTypeMessage("Alright fine, here's a joke: why did the chicken cross the road?", () => {
+            setFingerAction({ active: true, type: 'tap', x: '92%', y: '93%' });
             const timerSend = setTimeout(() => {
+              setFingerAction({ active: false, type: 'tap', x: '92%', y: '93%' });
               handleSendJadeMessage();
-            }, 1500);
+            }, 1000);
             autoplayTimersRef.current.push(timerSend);
           });
-        }, 3000);
+        }, 1500);
         autoplayTimersRef.current.push(timer);
       }
 
       else if (apiInteractionCount === 2 && !isAwaitingAPI && inputText === '') {
         const timer = setTimeout(() => {
           simulateTypeMessage("Okay damn, you're tough. Let me try a different approach...", () => {
+            setFingerAction({ active: true, type: 'tap', x: '92%', y: '93%' });
             const timerSend = setTimeout(() => {
+              setFingerAction({ active: false, type: 'tap', x: '92%', y: '93%' });
               handleSendJadeMessage();
-            }, 1500);
+            }, 1000);
             autoplayTimersRef.current.push(timerSend);
           });
-        }, 3000);
+        }, 1500);
         autoplayTimersRef.current.push(timer);
       }
 
       else if (apiInteractionCount === 3 && !isAwaitingAPI) {
         const timer = setTimeout(() => {
           handleVcrRewind();
-        }, 4000);
+        }, 2000);
         autoplayTimersRef.current.push(timer);
       }
     }
@@ -190,8 +202,13 @@ export default function RizzOnboardingV2() {
       if (currentNode && !currentNode.is_end_state) {
         if (isCustomKeyboardState === 'initial') {
           const timer = setTimeout(() => {
-            handleGenerateCustomReplies();
-          }, 2500);
+            setFingerAction({ active: true, type: 'tap', x: '50%', y: '82%' });
+            const timerGen = setTimeout(() => {
+              setFingerAction({ active: false, type: 'tap', x: '50%', y: '82%' });
+              handleGenerateCustomReplies();
+            }, 1000);
+            autoplayTimersRef.current.push(timerGen);
+          }, 1500);
           autoplayTimersRef.current.push(timer);
         } else if (isCustomKeyboardState === 'carousel') {
           const timer = setTimeout(() => {
@@ -204,14 +221,26 @@ export default function RizzOnboardingV2() {
                 }
               });
               const bestIndex = options.indexOf(bestOption);
-              setCarouselIndex(bestIndex);
+              
+              setFingerAction({ active: true, type: 'swipe', x: '50%', y: '50%' });
 
-              const timerSend = setTimeout(() => {
-                handleSendCarouselReply(bestOption);
-              }, 2000);
-              autoplayTimersRef.current.push(timerSend);
+              const timerSwipe = setTimeout(() => {
+                setCarouselIndex(bestIndex);
+                setFingerAction({ active: false, type: 'swipe', x: '50%', y: '50%' });
+
+                const timerPreSend = setTimeout(() => {
+                  setFingerAction({ active: true, type: 'tap', x: '50%', y: '82%' });
+                  const timerSend = setTimeout(() => {
+                    setFingerAction({ active: false, type: 'tap', x: '50%', y: '82%' });
+                    handleSendCarouselReply(bestOption);
+                  }, 1000);
+                  autoplayTimersRef.current.push(timerSend);
+                }, 500);
+                autoplayTimersRef.current.push(timerPreSend);
+              }, 1500);
+              autoplayTimersRef.current.push(timerSwipe);
             }
-          }, 3500);
+          }, 1000);
           autoplayTimersRef.current.push(timer);
         }
       }
@@ -533,7 +562,7 @@ export default function RizzOnboardingV2() {
 
   // Typewriter Effect for Round 2 mission banner ("close the deal WITH AI")
   const [typedMission, setTypedMission] = useState('');
-  const chloeMissionText = 'Your Mission: Close the deal — with AI';
+  const chloeMissionText = 'Your mission: Close the deal with AI, in 3 messages!';
   useEffect(() => {
     if (flowState === 'chat-chloe') {
       setTypedMission('');
@@ -580,7 +609,7 @@ export default function RizzOnboardingV2() {
 
   // Typewriter Effect for Round 1 mission capsule — types out when the box appears
   const [typedRound1Mission, setTypedRound1Mission] = useState('');
-  const round1MissionText = "Casanova AI does all the heavy lifting to get you the dates you deserve";
+  const round1MissionText = "Casanova AI does all the heavy lifting to get you the dates you deserve. Click the button below to see it in action!";
   const round1MissionBoldLen = 11; // "Casanova AI"
   useEffect(() => {
     if (flowState === 'intro-match') {
@@ -3424,7 +3453,13 @@ export default function RizzOnboardingV2() {
                     </div>
                   )}
                 </div>
-            </div>
+          {/* Virtual Finger for Autoplay */}
+          {fingerAction.active && (
+            <div 
+              className={`virtual-finger ${fingerAction.type}`} 
+              style={{ left: fingerAction.type === 'tap' ? fingerAction.x : undefined, top: fingerAction.type === 'tap' ? fingerAction.y : undefined }}
+            ></div>
+          )}
         </div>
       </div>
     </div>
