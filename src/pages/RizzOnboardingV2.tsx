@@ -222,12 +222,8 @@ export default function RizzOnboardingV2() {
               });
               const bestIndex = options.indexOf(bestOption);
               
-              setFingerAction({ active: true, type: 'swipe', x: '50%', y: '50%' });
-
-              const timerSwipe = setTimeout(() => {
-                setCarouselIndex(bestIndex);
-                setFingerAction({ active: false, type: 'swipe', x: '50%', y: '50%' });
-
+              if (bestIndex === 0) {
+                // No need to swipe, just tap the first option directly
                 const timerPreSend = setTimeout(() => {
                   setFingerAction({ active: true, type: 'tap', x: '85%', y: '87%' });
                   const timerSend = setTimeout(() => {
@@ -237,8 +233,25 @@ export default function RizzOnboardingV2() {
                   autoplayTimersRef.current.push(timerSend);
                 }, 500);
                 autoplayTimersRef.current.push(timerPreSend);
-              }, 1500);
-              autoplayTimersRef.current.push(timerSwipe);
+              } else {
+                setFingerAction({ active: true, type: 'swipe', x: '50%', y: '50%' });
+
+                const timerSwipe = setTimeout(() => {
+                  setCarouselIndex(bestIndex);
+                  setFingerAction({ active: false, type: 'swipe', x: '50%', y: '50%' });
+
+                  const timerPreSend = setTimeout(() => {
+                    setFingerAction({ active: true, type: 'tap', x: '85%', y: '87%' });
+                    const timerSend = setTimeout(() => {
+                      setFingerAction({ active: false, type: 'tap', x: '85%', y: '87%' });
+                      handleSendCarouselReply(bestOption);
+                    }, 1000);
+                    autoplayTimersRef.current.push(timerSend);
+                  }, 500);
+                  autoplayTimersRef.current.push(timerPreSend);
+                }, 1500);
+                autoplayTimersRef.current.push(timerSwipe);
+              }
             }
           }, 1000);
           autoplayTimersRef.current.push(timer);
