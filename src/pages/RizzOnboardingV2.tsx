@@ -3460,6 +3460,7 @@ export default function RizzOnboardingV2() {
               style={{ left: fingerAction.type === 'tap' ? fingerAction.x : undefined, top: fingerAction.type === 'tap' ? fingerAction.y : undefined }}
             ></div>
           )}
+          </div>
         </div>
       </div>
     </div>
