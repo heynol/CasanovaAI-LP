@@ -3035,7 +3035,7 @@ export default function RizzOnboardingV2() {
                 <span className="autoplay-text">Showcase Mode: <span style={{fontWeight: 'normal'}}>Watch AI get dates for you</span></span>
               </div>
               <div className="progress-bar-container">
-                <div className="progress-bar-fill" style={{ width: `${Math.min((chloeMessages.length / 3) * 100, 100)}%` }}></div>
+                <div className="progress-bar-fill" style={{ width: `${Math.min((chloeMessages.filter(m => m.type === 'Sent').length / 3) * 100, 100)}%` }}></div>
               </div>
             </div>
           )}
