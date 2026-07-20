@@ -149,9 +149,9 @@ export default function RizzOnboardingV2() {
       if (apiInteractionCount === 0 && !isAwaitingAPI && jadeMessages.length === 1 && inputText === '') {
         const timer = setTimeout(() => {
           simulateTypeMessage("Haha I'm hilarious. Trust me, I'm the funny guy in my friend group.", () => {
-            setFingerAction({ active: true, type: 'tap', x: '92%', y: '93%' });
+            setFingerAction({ active: true, type: 'tap', x: '90%', y: '95%' });
             const timerSend = setTimeout(() => {
-              setFingerAction({ active: false, type: 'tap', x: '92%', y: '93%' });
+              setFingerAction({ active: false, type: 'tap', x: '90%', y: '95%' });
               handleSendJadeMessage();
             }, 1000);
             autoplayTimersRef.current.push(timerSend);
@@ -163,9 +163,9 @@ export default function RizzOnboardingV2() {
       else if (apiInteractionCount === 1 && !isAwaitingAPI && inputText === '') {
         const timer = setTimeout(() => {
           simulateTypeMessage("Alright fine, here's a joke: why did the chicken cross the road?", () => {
-            setFingerAction({ active: true, type: 'tap', x: '92%', y: '93%' });
+            setFingerAction({ active: true, type: 'tap', x: '90%', y: '95%' });
             const timerSend = setTimeout(() => {
-              setFingerAction({ active: false, type: 'tap', x: '92%', y: '93%' });
+              setFingerAction({ active: false, type: 'tap', x: '90%', y: '95%' });
               handleSendJadeMessage();
             }, 1000);
             autoplayTimersRef.current.push(timerSend);
@@ -177,9 +177,9 @@ export default function RizzOnboardingV2() {
       else if (apiInteractionCount === 2 && !isAwaitingAPI && inputText === '') {
         const timer = setTimeout(() => {
           simulateTypeMessage("Okay damn, you're tough. Let me try a different approach...", () => {
-            setFingerAction({ active: true, type: 'tap', x: '92%', y: '93%' });
+            setFingerAction({ active: true, type: 'tap', x: '90%', y: '95%' });
             const timerSend = setTimeout(() => {
-              setFingerAction({ active: false, type: 'tap', x: '92%', y: '93%' });
+              setFingerAction({ active: false, type: 'tap', x: '90%', y: '95%' });
               handleSendJadeMessage();
             }, 1000);
             autoplayTimersRef.current.push(timerSend);
@@ -202,9 +202,9 @@ export default function RizzOnboardingV2() {
       if (currentNode && !currentNode.is_end_state) {
         if (isCustomKeyboardState === 'initial') {
           const timer = setTimeout(() => {
-            setFingerAction({ active: true, type: 'tap', x: '50%', y: '82%' });
+            setFingerAction({ active: true, type: 'tap', x: '50%', y: '87%' });
             const timerGen = setTimeout(() => {
-              setFingerAction({ active: false, type: 'tap', x: '50%', y: '82%' });
+              setFingerAction({ active: false, type: 'tap', x: '50%', y: '87%' });
               handleGenerateCustomReplies();
             }, 1000);
             autoplayTimersRef.current.push(timerGen);
@@ -229,9 +229,9 @@ export default function RizzOnboardingV2() {
                 setFingerAction({ active: false, type: 'swipe', x: '50%', y: '50%' });
 
                 const timerPreSend = setTimeout(() => {
-                  setFingerAction({ active: true, type: 'tap', x: '50%', y: '82%' });
+                  setFingerAction({ active: true, type: 'tap', x: '85%', y: '87%' });
                   const timerSend = setTimeout(() => {
-                    setFingerAction({ active: false, type: 'tap', x: '50%', y: '82%' });
+                    setFingerAction({ active: false, type: 'tap', x: '85%', y: '87%' });
                     handleSendCarouselReply(bestOption);
                   }, 1000);
                   autoplayTimersRef.current.push(timerSend);
