@@ -222,9 +222,9 @@ export default function RizzOnboardingV1() {
       if (currentNode && !currentNode.is_end_state) {
         if (isCustomKeyboardState === 'initial') {
           const timer = pausableSetTimeout(() => {
-            setFingerAction({ active: true, type: 'tap', x: '50%', y: '78%' });
+            setFingerAction({ active: true, type: 'tap', x: '50%', y: '70%' });
             const timerGen = pausableSetTimeout(() => {
-              setFingerAction({ active: false, type: 'tap', x: '50%', y: '78%' });
+              setFingerAction({ active: false, type: 'tap', x: '50%', y: '70%' });
               handleGenerateCustomReplies();
             }, 1000);
             autoplayTimersRef.current.push(timerGen);
