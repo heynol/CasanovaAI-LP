@@ -252,10 +252,10 @@ export default function RizzOnboardingV2() {
                 }, 500);
                 autoplayTimersRef.current.push(timerPreSend);
               } else {
-                setFingerAction({ active: true, type: 'swipe', x: '50%', y: '50%' });
+                setFingerAction({ active: true, type: 'swipe', x: '50%', y: '87%' });
                 const timerSwipe = pausableSetTimeout(() => {
                   setCarouselIndex(bestIndex);
-                  setFingerAction({ active: false, type: 'swipe', x: '50%', y: '50%' });
+                  setFingerAction({ active: false, type: 'swipe', x: '50%', y: '87%' });
 
                   const timerPreSend = pausableSetTimeout(() => {
                     setFingerAction({ active: true, type: 'tap', x: '50%', y: '87%' });
