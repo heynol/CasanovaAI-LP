@@ -123,8 +123,26 @@ export default function RizzOnboardingV2() {
   const autoplayTimersRef = useRef<any[]>([]);
   const typingIntervalRef = useRef<any>(null);
 
+  // Tap-and-hold pause state
+  const isPausedRef = useRef<boolean>(false);
+  const [isPausedUI, setIsPausedUI] = useState<boolean>(false);
+
+  const pausableSetTimeout = (callback: () => void, ms: number) => {
+    let elapsed = 0;
+    const interval = setInterval(() => {
+      if (!isPausedRef.current) {
+        elapsed += 50;
+        if (elapsed >= ms) {
+          clearInterval(interval);
+          callback();
+        }
+      }
+    }, 50);
+    return interval;
+  };
+
   const clearAutoplayTimers = () => {
-    autoplayTimersRef.current.forEach((t) => clearTimeout(t));
+    autoplayTimersRef.current.forEach((t) => clearInterval(t)); // Using clearInterval since pausableSetTimeout uses setInterval
     autoplayTimersRef.current = [];
     if (typingIntervalRef.current) {
       clearInterval(typingIntervalRef.current);
@@ -147,10 +165,10 @@ export default function RizzOnboardingV2() {
     // --- STAGE 1: JADE MANUAL CHAT ---
     if (flowState === 'chat-jade') {
       if (apiInteractionCount === 0 && !isAwaitingAPI && jadeMessages.length === 1 && inputText === '') {
-        const timer = setTimeout(() => {
+        const timer = pausableSetTimeout(() => {
           simulateTypeMessage("Haha I'm hilarious. Trust me, I'm the funny guy in my friend group.", () => {
             setFingerAction({ active: true, type: 'tap', x: '90%', y: '95%' });
-            const timerSend = setTimeout(() => {
+            const timerSend = pausableSetTimeout(() => {
               setFingerAction({ active: false, type: 'tap', x: '90%', y: '95%' });
               handleSendJadeMessage();
             }, 1000);
@@ -161,10 +179,10 @@ export default function RizzOnboardingV2() {
       }
       
       else if (apiInteractionCount === 1 && !isAwaitingAPI && inputText === '') {
-        const timer = setTimeout(() => {
+        const timer = pausableSetTimeout(() => {
           simulateTypeMessage("Alright fine, here's a joke: why did the chicken cross the road?", () => {
             setFingerAction({ active: true, type: 'tap', x: '90%', y: '95%' });
-            const timerSend = setTimeout(() => {
+            const timerSend = pausableSetTimeout(() => {
               setFingerAction({ active: false, type: 'tap', x: '90%', y: '95%' });
               handleSendJadeMessage();
             }, 1000);
@@ -175,10 +193,10 @@ export default function RizzOnboardingV2() {
       }
 
       else if (apiInteractionCount === 2 && !isAwaitingAPI && inputText === '') {
-        const timer = setTimeout(() => {
+        const timer = pausableSetTimeout(() => {
           simulateTypeMessage("Okay damn, you're tough. Let me try a different approach...", () => {
             setFingerAction({ active: true, type: 'tap', x: '90%', y: '95%' });
-            const timerSend = setTimeout(() => {
+            const timerSend = pausableSetTimeout(() => {
               setFingerAction({ active: false, type: 'tap', x: '90%', y: '95%' });
               handleSendJadeMessage();
             }, 1000);
@@ -189,7 +207,7 @@ export default function RizzOnboardingV2() {
       }
 
       else if (apiInteractionCount === 3 && !isAwaitingAPI) {
-        const timer = setTimeout(() => {
+        const timer = pausableSetTimeout(() => {
           handleVcrRewind();
         }, 2000);
         autoplayTimersRef.current.push(timer);
@@ -201,9 +219,9 @@ export default function RizzOnboardingV2() {
       const currentNode = secondRoundData.nodes[currentNodeId];
       if (currentNode && !currentNode.is_end_state) {
         if (isCustomKeyboardState === 'initial') {
-          const timer = setTimeout(() => {
+          const timer = pausableSetTimeout(() => {
             setFingerAction({ active: true, type: 'tap', x: '50%', y: '87%' });
-            const timerGen = setTimeout(() => {
+            const timerGen = pausableSetTimeout(() => {
               setFingerAction({ active: false, type: 'tap', x: '50%', y: '87%' });
               handleGenerateCustomReplies();
             }, 1000);
@@ -211,7 +229,7 @@ export default function RizzOnboardingV2() {
           }, 1500);
           autoplayTimersRef.current.push(timer);
         } else if (isCustomKeyboardState === 'carousel') {
-          const timer = setTimeout(() => {
+          const timer = pausableSetTimeout(() => {
             const options = currentNode.user_options || [];
             if (options.length > 0) {
               let bestOption = options[0];
@@ -224,9 +242,9 @@ export default function RizzOnboardingV2() {
               
               if (bestIndex === 0) {
                 // No need to swipe, just tap the first option directly
-                const timerPreSend = setTimeout(() => {
+                const timerPreSend = pausableSetTimeout(() => {
                   setFingerAction({ active: true, type: 'tap', x: '50%', y: '87%' });
-                  const timerSend = setTimeout(() => {
+                  const timerSend = pausableSetTimeout(() => {
                     setFingerAction({ active: false, type: 'tap', x: '50%', y: '87%' });
                     handleSendCarouselReply(bestOption);
                   }, 1000);
@@ -236,13 +254,13 @@ export default function RizzOnboardingV2() {
               } else {
                 setFingerAction({ active: true, type: 'swipe', x: '50%', y: '50%' });
 
-                const timerSwipe = setTimeout(() => {
+                const timerSwipe = pausableSetTimeout(() => {
                   setCarouselIndex(bestIndex);
                   setFingerAction({ active: false, type: 'swipe', x: '50%', y: '50%' });
 
-                  const timerPreSend = setTimeout(() => {
+                  const timerPreSend = pausableSetTimeout(() => {
                     setFingerAction({ active: true, type: 'tap', x: '50%', y: '87%' });
-                    const timerSend = setTimeout(() => {
+                    const timerSend = pausableSetTimeout(() => {
                       setFingerAction({ active: false, type: 'tap', x: '50%', y: '87%' });
                       handleSendCarouselReply(bestOption);
                     }, 1000);
@@ -816,6 +834,7 @@ export default function RizzOnboardingV2() {
     
     let index = 0;
     typingIntervalRef.current = setInterval(() => {
+      if (isPausedRef.current) return;
       const typed = text.substring(0, index + 1);
       setInputText(typed);
       if (inputRef.current) {
@@ -3041,6 +3060,11 @@ export default function RizzOnboardingV2() {
           {isAutoplay && <div className="ai-glow-frame"></div>}
 
           {/* --- Autoplay Showcase Mode Overlay --- */}
+          {isPausedUI && (
+            <div className="paused-indicator">
+              Paused
+            </div>
+          )}
           {isAutoplay && (
             <div className="autoplay-badge-overlay" style={{flexDirection: 'column', padding: '10px 18px'}}>
               <div className="autoplay-badge-left" style={{ width: '100%', marginBottom: '10px' }}>
