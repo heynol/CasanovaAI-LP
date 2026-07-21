@@ -222,9 +222,9 @@ export default function RizzOnboardingV1() {
       if (currentNode && !currentNode.is_end_state) {
         if (isCustomKeyboardState === 'initial') {
           const timer = pausableSetTimeout(() => {
-            setFingerAction({ active: true, type: 'tap', x: '50%', y: '70%' });
+            setFingerAction({ active: true, type: 'tap', x: '50%', y: '62%' });
             const timerGen = pausableSetTimeout(() => {
-              setFingerAction({ active: false, type: 'tap', x: '50%', y: '70%' });
+              setFingerAction({ active: false, type: 'tap', x: '50%', y: '62%' });
               handleGenerateCustomReplies();
             }, 1000);
             autoplayTimersRef.current.push(timerGen);
@@ -245,24 +245,24 @@ export default function RizzOnboardingV1() {
               if (bestIndex === 0) {
                 // No need to swipe, just tap the first option directly
                 const timerPreSend = pausableSetTimeout(() => {
-                  setFingerAction({ active: true, type: 'tap', x: '50%', y: '78%' });
+                  setFingerAction({ active: true, type: 'tap', x: '50%', y: '65%' });
                   const timerSend = pausableSetTimeout(() => {
-                    setFingerAction({ active: false, type: 'tap', x: '50%', y: '78%' });
+                    setFingerAction({ active: false, type: 'tap', x: '50%', y: '65%' });
                     handleSendCarouselReply(bestOption);
                   }, 1000);
                   autoplayTimersRef.current.push(timerSend);
                 }, 500);
                 autoplayTimersRef.current.push(timerPreSend);
               } else {
-                setFingerAction({ active: true, type: 'swipe', x: '50%', y: '78%' });
+                setFingerAction({ active: true, type: 'swipe', x: '50%', y: '65%' });
                 const timerSwipe = pausableSetTimeout(() => {
                   setCarouselIndex(bestIndex);
-                  setFingerAction({ active: false, type: 'swipe', x: '50%', y: '78%' });
+                  setFingerAction({ active: false, type: 'swipe', x: '50%', y: '65%' });
 
                   const timerPreSend = pausableSetTimeout(() => {
-                    setFingerAction({ active: true, type: 'tap', x: '50%', y: '78%' });
+                    setFingerAction({ active: true, type: 'tap', x: '50%', y: '65%' });
                     const timerSend = pausableSetTimeout(() => {
-                      setFingerAction({ active: false, type: 'tap', x: '50%', y: '78%' });
+                      setFingerAction({ active: false, type: 'tap', x: '50%', y: '65%' });
                       handleSendCarouselReply(bestOption);
                     }, 1000);
                     autoplayTimersRef.current.push(timerSend);
