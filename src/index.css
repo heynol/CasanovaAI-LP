@@ -322,6 +322,17 @@ a {
   opacity: 0.9;
 }
 
+.ai-action-btn {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 1) 0%, rgba(167, 139, 250, 1) 100%);
+  color: white;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.4);
+}
+
+.ai-action-btn:hover {
+  box-shadow: 0 0 20px rgba(167, 139, 250, 0.7);
+}
+
 .progress-bar-container {
   width: 100%;
   height: 4px;

@@ -3094,7 +3094,7 @@ export default function RizzOnboardingV1() {
               <div className="neutral-badge-left">
                 <span className="neutral-text">Select suggested replies</span>
               </div>
-              <button className="neutral-action-btn" onClick={handleAutomate}>
+              <button className="neutral-action-btn ai-action-btn" onClick={handleAutomate}>
                 <Sparkles size={14} style={{ marginRight: '6px' }} />
                 Watch AI do it
               </button>
