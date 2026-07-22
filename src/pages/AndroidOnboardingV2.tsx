@@ -3054,6 +3054,9 @@ export default function AndroidOnboardingV2() {
           onTouchEnd={handleIntroTouchEnd}
           onMouseDown={handleIntroMouseDown}
           onMouseUp={handleIntroMouseUp}
+          onPointerDown={() => { isPausedRef.current = true; setIsPausedUI(true); }}
+          onPointerUp={() => { isPausedRef.current = false; setIsPausedUI(false); }}
+          onPointerCancel={() => { isPausedRef.current = false; setIsPausedUI(false); }}
         >
           {/* --- AI-controlled ambient glow outline (Siri/Claude style) --- */}
           {isAutoplay && <div className="ai-glow-frame"></div>}
