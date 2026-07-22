@@ -243,24 +243,24 @@ export default function RizzOnboardingV2() {
               if (bestIndex === 0) {
                 // No need to swipe, just tap the first option directly
                 const timerPreSend = pausableSetTimeout(() => {
-                  setFingerAction({ active: true, type: 'tap', x: '50%', y: '87%' });
+                  setFingerAction({ active: true, type: 'tap', x: '50%', y: '78%' });
                   const timerSend = pausableSetTimeout(() => {
-                    setFingerAction({ active: false, type: 'tap', x: '50%', y: '87%' });
+                    setFingerAction({ active: false, type: 'tap', x: '50%', y: '78%' });
                     handleSendCarouselReply(bestOption);
                   }, 1000);
                   autoplayTimersRef.current.push(timerSend);
                 }, 500);
                 autoplayTimersRef.current.push(timerPreSend);
               } else {
-                setFingerAction({ active: true, type: 'swipe', x: '50%', y: '87%' });
+                setFingerAction({ active: true, type: 'swipe', x: '50%', y: '78%' });
                 const timerSwipe = pausableSetTimeout(() => {
                   setCarouselIndex(bestIndex);
-                  setFingerAction({ active: false, type: 'swipe', x: '50%', y: '87%' });
+                  setFingerAction({ active: false, type: 'swipe', x: '50%', y: '78%' });
 
                   const timerPreSend = pausableSetTimeout(() => {
-                    setFingerAction({ active: true, type: 'tap', x: '50%', y: '87%' });
+                    setFingerAction({ active: true, type: 'tap', x: '50%', y: '78%' });
                     const timerSend = pausableSetTimeout(() => {
-                      setFingerAction({ active: false, type: 'tap', x: '50%', y: '87%' });
+                      setFingerAction({ active: false, type: 'tap', x: '50%', y: '78%' });
                       handleSendCarouselReply(bestOption);
                     }, 1000);
                     autoplayTimersRef.current.push(timerSend);
@@ -3493,7 +3493,7 @@ export default function RizzOnboardingV2() {
           {fingerAction.active && (
             <div 
               className={`virtual-finger ${fingerAction.type}`} 
-              style={{ left: fingerAction.type === 'tap' ? fingerAction.x : undefined, top: fingerAction.type === 'tap' ? fingerAction.y : undefined }}
+              style={{ left: fingerAction.x, top: fingerAction.y }}
             ></div>
           )}
           </div>
