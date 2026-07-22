@@ -14,6 +14,8 @@ import TermsOfService from './pages/TermsOfService';
 import RizzOnboarding from './pages/RizzOnboarding';
 import RizzOnboardingV1 from './pages/RizzOnboardingV1';
 import RizzOnboardingV2 from './pages/RizzOnboardingV2';
+import AndroidOnboardingV1 from './pages/AndroidOnboardingV1';
+import AndroidOnboardingV2 from './pages/AndroidOnboardingV2';
 import FeatureReel from './pages/FeatureReel';
 import { trackEvent } from './mixpanel';
 
@@ -340,7 +342,7 @@ function LandingPage() {
 function App() {
   const location = useLocation();
   const path = location.pathname.toLowerCase();
-  const isOnboarding = path === '/rizzonboarding' || path === '/rizzonboardingv1' || path === '/rizzonboardingv2';
+  const isOnboarding = path === '/rizzonboarding' || path === '/rizzonboardingv1' || path === '/rizzonboardingv2' || path === '/androidonboardingv1' || path === '/androidonboardingv2';
   const isReel = path === '/featurereel';
   const isBare = isOnboarding || isReel;
 
@@ -355,6 +357,8 @@ function App() {
           <Route path="/RizzOnboarding" element={<RizzOnboarding />} />
           <Route path="/RizzOnboardingV1" element={<RizzOnboardingV1 />} />
           <Route path="/RizzOnboardingV2" element={<RizzOnboardingV2 />} />
+          <Route path="/AndroidOnboardingV1" element={<AndroidOnboardingV1 />} />
+          <Route path="/AndroidOnboardingV2" element={<AndroidOnboardingV2 />} />
           <Route path="/featurereel" element={<FeatureReel />} />
         </Routes>
       </main>
